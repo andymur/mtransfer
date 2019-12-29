@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 import java.util.Optional;
 
 @Path("/account")
@@ -24,6 +25,12 @@ public class AccountResource {
     public AccountState read(@PathParam("id") long id) {
         LOGGER.info("read; id={}", id);
         return accountService.get(id);
+    }
+
+    @GET
+    public List<AccountState> list() {
+        LOGGER.info("list; ");
+        return accountService.listAccounts();
     }
 
     @PUT
