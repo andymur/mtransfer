@@ -4,6 +4,8 @@ package com.andymur.toyproject;
 import com.andymur.toyproject.core.AccountService;
 import com.andymur.toyproject.resources.AccountResource;
 import io.dropwizard.Application;
+import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 
@@ -26,6 +28,12 @@ public class MTransferApplication extends Application<MTransferConfiguration> {
     @Override
     public void initialize(Bootstrap<MTransferConfiguration> bootstrap) {
         super.initialize(bootstrap);
+        bootstrap.addBundle(new MigrationsBundle<MTransferConfiguration>() {
+            @Override
+            public DataSourceFactory getDataSourceFactory(MTransferConfiguration configuration) {
+                return configuration.getDataSourceFactory();
+            }
+        });
     }
 
     @Override

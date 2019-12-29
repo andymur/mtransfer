@@ -23,4 +23,4 @@ logging:
   level: INFO
   loggers:
     #override
-    #"com.andymur.toyproject.resources.AccountResource": DEBUG
+    "com.andymur.toyproject.resources.AccountResource": DEBUG
