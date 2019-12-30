@@ -13,6 +13,10 @@ public class MTransferConfiguration extends Configuration {
 	@NotNull
 	private DataSourceFactory database = new DataSourceFactory();
 
+	@Valid
+	@NotNull
+	private boolean doRunMigrations;
+
 	@JsonProperty("database")
 	public DataSourceFactory getDataSourceFactory() {
 		return database;
@@ -21,5 +25,16 @@ public class MTransferConfiguration extends Configuration {
 	@JsonProperty("database")
 	public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
 		this.database = dataSourceFactory;
+	}
+
+
+	@JsonProperty("runMigrationsOnStart")
+	public boolean doRunMigrations() {
+		return doRunMigrations;
+	}
+
+	@JsonProperty("runMigrationsOnStart")
+	public void setDoRunMigrations(boolean doRunMigrations) {
+		this.doRunMigrations = doRunMigrations;
 	}
 }

@@ -1,3 +1,5 @@
+runMigrationsOnStart: true
+
 server:
   applicationConnectors:
     - type: http

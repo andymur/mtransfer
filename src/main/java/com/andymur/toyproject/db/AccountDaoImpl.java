@@ -15,7 +15,7 @@ public class AccountDaoImpl implements AccountDao {
 
     public List<AccountState> listAccounts() {
         return jdbi.withHandle(handle ->
-                handle.createQuery("select id, amount from accounts order by id")
+                handle.createQuery("select id, amount from public.accounts order by id")
                         .map((rs, ctx) -> new AccountState(rs.getLong(0), rs.getBigDecimal(1)))
                         .list());
     }
