@@ -15,5 +15,5 @@ database:
   user: sa
   password: sa
 
-  url: jdbc:hsqldb:target/example
+  url: jdbc:hsqldb:mem:mtransfer
   validationQuery: SELECT * FROM INFORMATION_SCHEMA.SYSTEM_TABLES

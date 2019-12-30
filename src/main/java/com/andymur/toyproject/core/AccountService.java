@@ -1,19 +1,18 @@
 package com.andymur.toyproject.core;
 
-import com.andymur.toyproject.db.AccountDao;
-import io.dropwizard.db.DataSourceFactory;
+import com.andymur.toyproject.db.AccountRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AccountService {
-    private final AccountDao accountDao;
+
     private final Map<Long, AccountState> accounts = new ConcurrentHashMap<>();
 
-    public AccountService(AccountDao accountDao) {
-        this.accountDao = accountDao;
+    public AccountService() {
     }
 
     public AccountState get(long id) {
@@ -29,7 +28,7 @@ public class AccountService {
         return Optional.ofNullable(accounts.remove(id));
     }
 
-    public List<AccountState> listAccounts() {
-        return accountDao.listAccounts();
+    public List<AccountState> list() {
+        return new ArrayList<>(accounts.values());
     }
 }

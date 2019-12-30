@@ -30,7 +30,7 @@ public class AccountResource {
     @GET
     public List<AccountState> list() {
         LOGGER.info("list; ");
-        return accountService.listAccounts();
+        return accountService.list();
     }
 
     @PUT

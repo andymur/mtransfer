@@ -31,6 +31,14 @@ public class AccountState {
         return amount;
     }
 
+    public void setId(final long id) {
+        this.id = id;
+    }
+
+    public void setAmount(final BigDecimal amount) {
+        this.amount = amount;
+    }
+
     @Override
     public String toString() {
         return "AccountState{" +
