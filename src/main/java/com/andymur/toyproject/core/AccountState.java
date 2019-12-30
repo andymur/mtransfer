@@ -39,6 +39,10 @@ public class AccountState {
         this.amount = amount;
     }
 
+    public void addAmount(final BigDecimal amountToAdd) {
+        setAmount(amount.add(amountToAdd));
+    }
+
     @Override
     public String toString() {
         return "AccountState{" +

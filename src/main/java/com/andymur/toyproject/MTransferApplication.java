@@ -4,7 +4,7 @@ package com.andymur.toyproject;
 import java.sql.Connection;
 import java.util.concurrent.Executors;
 
-import com.andymur.toyproject.core.AccountService;
+import com.andymur.toyproject.core.AccountServiceImpl;
 import com.andymur.toyproject.core.persistence.PersistenceServiceImpl;
 import com.andymur.toyproject.core.persistence.operations.OperationHandler;
 import com.andymur.toyproject.db.AccountRepository;
@@ -26,6 +26,12 @@ public class MTransferApplication extends Application<MTransferConfiguration> {
     //TODO: fix health check warning
     //TODO: check sub configuration
     //TODO: check guice?
+
+    //TODO: Add seq generator
+    //TODO: Polish
+    //TODO: Integration test with persistence (ideally with random multi threading)
+    //TODO: Add documentation and pretty logging in the tests
+    //TODO: Add banner
     // https://github.com/dropwizard/dropwizard/tree/master/dropwizard-example
     // https://www.dropwizard.io/en/stable/getting-started.html
     // https://www.dropwizard.io/en/stable/manual/core.html#man-core-commands-configured
@@ -64,7 +70,7 @@ public class MTransferApplication extends Application<MTransferConfiguration> {
         final PersistenceServiceImpl persistenceService = new PersistenceServiceImpl(accountRepository, operationHandler);
         startPersistenceServiceThread(persistenceService);
 
-        final AccountService accountService = new AccountService();
+        final AccountServiceImpl accountService = new AccountServiceImpl(persistenceService);
 
         final AccountResource accountResource = new AccountResource(accountService);
 

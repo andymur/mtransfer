@@ -1,12 +1,14 @@
 package com.andymur.toyproject.resources;
 
 import com.andymur.toyproject.core.AccountService;
+import com.andymur.toyproject.core.AccountServiceImpl;
 import com.andymur.toyproject.core.AccountState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +39,14 @@ public class AccountResource {
     public AccountState write(AccountState accountState) {
         LOGGER.info("write; account={}", accountState);
         return accountService.put(accountState);
+    }
+
+    @POST
+    @Path("{sourceAccountId}/{destinationAccountId}/{amount}")
+    public void transfer(@PathParam("sourceAccountId") long sourceAccountId,
+                         @PathParam("destinationAccountId") long destinationAccountId,
+                         @PathParam("amount")BigDecimal amount) {
+        accountService.transfer(sourceAccountId, destinationAccountId, amount);
     }
 
     @DELETE
