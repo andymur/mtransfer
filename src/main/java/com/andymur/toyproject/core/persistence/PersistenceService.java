@@ -5,10 +5,12 @@ import java.util.Optional;
 
 import com.andymur.toyproject.core.AccountState;
 import com.andymur.toyproject.core.persistence.operations.AccountOperation;
+import com.andymur.toyproject.core.persistence.operations.AccountOperation.Status;
 
-public interface PersistenceService {
-	void addOperation(AccountOperation operation);
-	boolean operationIsDone(String operationId);
+public interface PersistenceService extends Runnable {
+	String addOperation(AccountOperation operation);
+	Status getOperationStatus(String operationId);
+	boolean hasOperationsToComplete();
 	List<AccountState> list();
 	Optional<AccountState> find(long id);
 }

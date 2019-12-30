@@ -9,7 +9,6 @@ import com.andymur.toyproject.core.persistence.PersistenceServiceImpl;
 import com.andymur.toyproject.core.persistence.operations.OperationHandler;
 import com.andymur.toyproject.db.AccountRepository;
 import com.andymur.toyproject.resources.AccountResource;
-import com.andymur.toyproject.resources.PersistenceResource;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.dropwizard.Application;
 import io.dropwizard.db.DataSourceFactory;
@@ -68,10 +67,8 @@ public class MTransferApplication extends Application<MTransferConfiguration> {
         final AccountService accountService = new AccountService();
 
         final AccountResource accountResource = new AccountResource(accountService);
-        final PersistenceResource persistenceResource = new PersistenceResource(persistenceService, accountRepository);
 
         environment.jersey().register(accountResource);
-        environment.jersey().register(persistenceResource);
     }
 
     private void runMigrations(MTransferConfiguration configuration, Environment environment) throws Exception {

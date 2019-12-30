@@ -13,7 +13,6 @@ public class OperationHandler {
 	}
 
 	public void handle(final AccountOperation accountOperation) {
-		//TODO: check jdbi exception
 		switch (accountOperation.getType()) {
 			case ADD: {
 				AddAccountOperation addOperation = ((AddAccountOperation) accountOperation);

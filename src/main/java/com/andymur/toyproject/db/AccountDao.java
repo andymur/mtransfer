@@ -28,6 +28,6 @@ public interface AccountDao {
     @SqlUpdate("DELETE FROM accounts where id = :id")
     void deleteAccount(@Bind("id") long id);
 
-    @SqlUpdate("UPDATE accounts SET amount = :newAmount where id = :id)")
+    @SqlUpdate("UPDATE accounts SET amount = :newAmount where id = :id")
     void updateAccount(@Bind("id") long id, @Bind("newAmount") BigDecimal newAmount);
 }

@@ -16,4 +16,8 @@ public interface AccountOperation {
 	enum OperationType {
 		ADD, UPDATE, DELETE
 	}
+
+	enum Status {
+		DONE, FAILED, IN_PROGRESS
+	}
 }
