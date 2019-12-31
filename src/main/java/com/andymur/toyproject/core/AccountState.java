@@ -64,4 +64,8 @@ public class AccountState {
     public int hashCode() {
         return Objects.hash(id, amount);
     }
+
+    public AccountState copyOf() {
+        return new AccountState(id, amount);
+    }
 }

@@ -36,8 +36,8 @@ public class AccountResource {
     }
 
     @PUT
-    public AccountState write(AccountState accountState) {
-        LOGGER.info("write; account={}", accountState);
+    public AccountState put(AccountState accountState) {
+        LOGGER.info("put; account={}", accountState);
         return accountService.put(accountState);
     }
 

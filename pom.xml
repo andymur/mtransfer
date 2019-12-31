@@ -16,17 +16,11 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <dropwizard.version>2.0.0</dropwizard.version>
-    <junit.jupiter.version>5.5.2</junit.jupiter.version>
+    <junit.jupiter.version>5.3.2</junit.jupiter.version>
     <hsqldb.version>2.5.0</hsqldb.version>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit.jupiter.version}</version>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>io.dropwizard</groupId>
@@ -57,6 +51,13 @@
       <groupId>org.hsqldb</groupId>
       <artifactId>hsqldb</artifactId>
       <version>${hsqldb.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.jupiter.version}</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>

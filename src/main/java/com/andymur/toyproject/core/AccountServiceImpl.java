@@ -21,20 +21,26 @@ public class  AccountServiceImpl implements AccountService {
         this.persistenceService = persistenceService;
     }
 
+    @Override
     public AccountState get(long id) {
         //TODO: consider raising an exception instead of returning default value
         return accounts.getOrDefault(id, AccountState.DEFAULT);
     }
 
+    @Override
     public AccountState put(AccountState accountState) {
+        //TODO: use persistence
         accounts.put(accountState.getId(), accountState);
         return accountState;
     }
 
+    @Override
     public Optional<AccountState> delete(long id) {
+        //TODO: use persistence
         return Optional.ofNullable(accounts.remove(id));
     }
 
+    @Override
     public List<AccountState> list() {
         return new ArrayList<>(accounts.values());
     }
@@ -51,12 +57,18 @@ public class  AccountServiceImpl implements AccountService {
 
     @Override
     public void withdraw(long accountId, BigDecimal amountToWithdraw) {
-
+        amountToAdd(accountId, amountToWithdraw.negate());
     }
 
     @Override
     public void deposit(long accountId, BigDecimal amountToAdd) {
+        amountToAdd(accountId, amountToAdd);
+    }
 
+    @Override
+    public void amountToAdd(long accountId, BigDecimal amountToAdd) {
+        //TODO: use persistence
+        get(accountId).addAmount(amountToAdd);
     }
 
     private void lockAndTransfer(final long lowerAccountId,
@@ -65,11 +77,8 @@ public class  AccountServiceImpl implements AccountService {
         //TODO: consider using ReadWriteLock
         synchronized (get(lowerAccountId)) {
             synchronized (get(upperAccountId)) {
-                AccountState firstAccount = get(lowerAccountId);
-                AccountState secondAccount = get(upperAccountId);
-
-                firstAccount.addAmount(amountToTransfer.negate());
-                secondAccount.addAmount(amountToTransfer);
+                withdraw(lowerAccountId, amountToTransfer);
+                deposit(upperAccountId, amountToTransfer);
             }
         }
     }

@@ -19,7 +19,8 @@ import java.math.BigDecimal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class AccountAcceptanceTest {
+//TODO: document me
+public class AccountResourceTest {
     //TODO: test transfer, no sufficient funds, same account, lower & greater, to/from non existed account
     //TODO: Add persistence to AccountService (mock it here)
     private static final String CONFIG_PATH = ResourceHelpers.resourceFilePath("mtransfer-test.yml");

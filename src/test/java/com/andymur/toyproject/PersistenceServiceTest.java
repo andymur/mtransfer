@@ -34,7 +34,8 @@ import java.util.concurrent.Executors;
 
 import static org.hamcrest.CoreMatchers.is;
 
-public class PersistenceTest {
+//TODO: document me
+public class PersistenceServiceTest {
 
     private static String DB_URL = "jdbc:hsqldb:mem:mtransfer";
     private static String DB_USERNAME = "sa";
