@@ -35,7 +35,7 @@ public class PersistenceServiceImpl implements PersistenceService {
 	}
 
 	@Override
-	public String addOperation(AccountOperation operation) {
+	public String addOperation(final AccountOperation operation) {
 		operationsQueue.add(operation);
 		return operation.getOperationId();
 	}
@@ -49,11 +49,6 @@ public class PersistenceServiceImpl implements PersistenceService {
 		} else {
 			return Status.IN_PROGRESS;
 		}
-	}
-
-	@Override
-	public boolean hasOperationsToComplete() {
-		return !operationsQueue.isEmpty();
 	}
 
 	@Override

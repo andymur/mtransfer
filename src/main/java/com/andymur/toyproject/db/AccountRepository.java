@@ -8,25 +8,24 @@ import com.andymur.toyproject.core.AccountState;
 import org.jdbi.v3.core.Jdbi;
 
 public class AccountRepository {
+
 	private final Jdbi jdbi;
 
 	public AccountRepository(final Jdbi jdbi) {
 		this.jdbi = jdbi;
 	}
 
-	public void add(final long id, final BigDecimal bigDecimal) {
+	public void add(final long id,
+					final BigDecimal bigDecimal) {
 		getDao().addAccount(id, bigDecimal);
 	}
 
-	public void add(final AccountState accountState) {
-		getDao().addAccount(accountState.getId(), accountState.getAmount());
-	}
-
-	public void delete(long id) {
+	public void delete(final long id) {
 		getDao().deleteAccount(id);
 	}
 
-	public void update(long id, BigDecimal newAmount) {
+	public void update(final long id,
+					   final BigDecimal newAmount) {
 		getDao().updateAccount(id, newAmount);
 	}
 

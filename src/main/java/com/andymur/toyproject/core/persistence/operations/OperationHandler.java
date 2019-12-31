@@ -1,7 +1,5 @@
 package com.andymur.toyproject.core.persistence.operations;
 
-import java.util.concurrent.TimeUnit;
-
 import com.andymur.toyproject.db.AccountRepository;
 
 public class OperationHandler {
@@ -20,7 +18,7 @@ public class OperationHandler {
 			}
 			break;
 			case DELETE:
-				accountRepository.delete(((DeleteAccountOperation) accountOperation).getAccountId());
+				accountRepository.delete(accountOperation.getAccountId());
 				break;
 			case UPDATE: {
 				UpdateAccountOperation updateOperation = (UpdateAccountOperation) accountOperation;

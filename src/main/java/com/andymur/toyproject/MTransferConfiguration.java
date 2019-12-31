@@ -23,7 +23,7 @@ public class MTransferConfiguration extends Configuration {
 	}
 
 	@JsonProperty("database")
-	public void setDataSourceFactory(DataSourceFactory dataSourceFactory) {
+	public void setDataSourceFactory(final DataSourceFactory dataSourceFactory) {
 		this.database = dataSourceFactory;
 	}
 
@@ -34,7 +34,7 @@ public class MTransferConfiguration extends Configuration {
 	}
 
 	@JsonProperty("runMigrationsOnStart")
-	public void setDoRunMigrations(boolean doRunMigrations) {
+	public void setDoRunMigrations(final boolean doRunMigrations) {
 		this.doRunMigrations = doRunMigrations;
 	}
 }

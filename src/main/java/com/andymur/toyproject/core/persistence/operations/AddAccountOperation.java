@@ -16,7 +16,8 @@ public class AddAccountOperation implements AccountOperation {
 		operationId = UUID.randomUUID().toString();
 	}
 
-	public AddAccountOperation(final long accountId, final BigDecimal amount) {
+	public AddAccountOperation(final long accountId,
+							   final BigDecimal amount) {
 		this();
 		this.accountId = accountId;
 		this.amount = amount;

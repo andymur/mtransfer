@@ -22,20 +22,20 @@ public class  AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountState get(long id) {
+    public AccountState get(final long id) {
         //TODO: consider raising an exception instead of returning default value
         return accounts.getOrDefault(id, AccountState.DEFAULT);
     }
 
     @Override
-    public AccountState put(AccountState accountState) {
+    public AccountState put(final AccountState accountState) {
         //TODO: use persistence
         accounts.put(accountState.getId(), accountState);
         return accountState;
     }
 
     @Override
-    public Optional<AccountState> delete(long id) {
+    public Optional<AccountState> delete(final long id) {
         //TODO: use persistence
         return Optional.ofNullable(accounts.remove(id));
     }
@@ -46,7 +46,9 @@ public class  AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void transfer(long sourceAccountId, long destinationAccountId, BigDecimal amountToTransfer) {
+    public void transfer(final long sourceAccountId,
+                         final long destinationAccountId,
+                         final BigDecimal amountToTransfer) {
         //TODO: add exceptions handling (e.g. account not found, source has no sufficient funds etc)
         if (sourceAccountId < destinationAccountId) {
             lockAndTransfer(sourceAccountId, destinationAccountId, amountToTransfer);
@@ -56,17 +58,20 @@ public class  AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void withdraw(long accountId, BigDecimal amountToWithdraw) {
+    public void withdraw(final long accountId,
+                         final BigDecimal amountToWithdraw) {
         amountToAdd(accountId, amountToWithdraw.negate());
     }
 
     @Override
-    public void deposit(long accountId, BigDecimal amountToAdd) {
+    public void deposit(final long accountId,
+                        final BigDecimal amountToAdd) {
         amountToAdd(accountId, amountToAdd);
     }
 
     @Override
-    public void amountToAdd(long accountId, BigDecimal amountToAdd) {
+    public void amountToAdd(final long accountId,
+                            final BigDecimal amountToAdd) {
         //TODO: use persistence
         get(accountId).addAmount(amountToAdd);
     }

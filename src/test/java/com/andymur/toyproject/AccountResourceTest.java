@@ -88,57 +88,61 @@ public class AccountResourceTest {
         assertThat(deletedAccountResponse.getStatus(), is(HttpStatus.OK_200));
     }
 
-    private static long createAccount(long id) {
+    private static long createAccount(final long id) {
         return createAccount(id, new BigDecimal("0.00"));
     }
 
-    private static long createAccount(long id, BigDecimal initialAmount) {
+    private static long createAccount(final long id,
+                                      final BigDecimal initialAmount) {
         Response response = putAccountRequestResponse(CLIENT, new AccountState(id, initialAmount));
         Assert.assertThat("Account creation request has been successfully done",
                 response.getStatus(), is(HttpStatus.OK_200));
         return id;
     }
 
-    private static void transfer(long sourceAccountId,
-                                 long destinationAccountId,
-                                 BigDecimal amountToTransfer) {
+    private static void transfer(final long sourceAccountId,
+                                 final long destinationAccountId,
+                                 final BigDecimal amountToTransfer) {
         Response response = transferRequestResponse(CLIENT, sourceAccountId, destinationAccountId, amountToTransfer);
         Assert.assertThat("Money transfer request has been successfully done",
                 response.getStatus(), is(HttpStatus.NO_CONTENT_204));
     }
 
-    private static AccountState getAccount(long accountId) {
+    private static AccountState getAccount(final long accountId) {
         Response response = requestAccountStateResponse(CLIENT, accountId);
         Assert.assertThat("Account status request has been successfully done",
                 response.getStatus(), is(HttpStatus.OK_200));
         return response.readEntity(AccountState.class);
     }
 
-    private static Response transferRequestResponse(Client client,
-                                                    long sourceAccountId,
-                                                    long destinationAccountId,
-                                                    BigDecimal amountToTransfer) {
+    private static Response transferRequestResponse(final Client client,
+                                                    final long sourceAccountId,
+                                                    final long destinationAccountId,
+                                                    final BigDecimal amountToTransfer) {
         return client.target(
                 String.format("http://localhost:%d/account/%d/%d/%s", SUPPORT.getLocalPort(), sourceAccountId, destinationAccountId, amountToTransfer)
         ).request()
         .post(Entity.entity(Void.class, MediaType.APPLICATION_JSON_TYPE));
     }
 
-    private static Response deleteAccountRequestResponse(Client client, long id) {
+    private static Response deleteAccountRequestResponse(final Client client,
+                                                         final long id) {
         return client.target(
                 String.format("http://localhost:%d/account/%d", SUPPORT.getLocalPort(), id)
         ).request()
         .delete();
     }
 
-    private static Response requestAccountStateResponse(Client client, long id) {
+    private static Response requestAccountStateResponse(final Client client,
+                                                        final long id) {
         return client.target(
                 String.format("http://localhost:%d/account/%d", SUPPORT.getLocalPort(), id))
                 .request()
                 .get();
     }
 
-    private static Response putAccountRequestResponse(Client client, AccountState account) {
+    private static Response putAccountRequestResponse(final Client client,
+                                                      final AccountState account) {
         return client.target(
                 String.format("http://localhost:%d/account/", SUPPORT.getLocalPort()))
                 .request()

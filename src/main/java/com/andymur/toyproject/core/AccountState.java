@@ -16,7 +16,8 @@ public class AccountState {
         //for the sake of de-serialization
     }
 
-    public AccountState(long id, BigDecimal amount) {
+    public AccountState(final long id,
+                        final BigDecimal amount) {
         this.id = id;
         this.amount = amount;
     }
@@ -43,6 +44,10 @@ public class AccountState {
         setAmount(amount.add(amountToAdd));
     }
 
+    public AccountState copyOf() {
+        return new AccountState(id, amount);
+    }
+
     @Override
     public String toString() {
         return "AccountState{" +
@@ -63,9 +68,5 @@ public class AccountState {
     @Override
     public int hashCode() {
         return Objects.hash(id, amount);
-    }
-
-    public AccountState copyOf() {
-        return new AccountState(id, amount);
     }
 }

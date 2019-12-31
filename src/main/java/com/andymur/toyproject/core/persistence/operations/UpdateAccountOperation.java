@@ -15,7 +15,8 @@ public class UpdateAccountOperation implements AccountOperation {
 		operationId = UUID.randomUUID().toString();
 	}
 
-	public UpdateAccountOperation(final long accountId, final BigDecimal newAmount) {
+	public UpdateAccountOperation(final long accountId,
+								  final BigDecimal newAmount) {
 		this();
 		this.accountId = accountId;
 		this.newAmount = newAmount;

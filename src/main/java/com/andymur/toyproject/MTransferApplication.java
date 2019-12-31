@@ -36,7 +36,7 @@ public class MTransferApplication extends Application<MTransferConfiguration> {
     // https://www.dropwizard.io/en/stable/getting-started.html
     // https://www.dropwizard.io/en/stable/manual/core.html#man-core-commands-configured
     // https://www.dropwizard.io/en/stable/manual/testing.html
-    public static void main( String[] args ) throws Exception {
+    public static void main( final String[] args ) throws Exception {
         new MTransferApplication().run(args);
     }
 
@@ -46,7 +46,7 @@ public class MTransferApplication extends Application<MTransferConfiguration> {
     }
 
     @Override
-    public void initialize(Bootstrap<MTransferConfiguration> bootstrap) {
+    public void initialize(final Bootstrap<MTransferConfiguration> bootstrap) {
         super.initialize(bootstrap);
         bootstrap.addBundle(new MigrationsBundle<MTransferConfiguration>() {
             @Override
@@ -57,8 +57,8 @@ public class MTransferApplication extends Application<MTransferConfiguration> {
     }
 
     @Override
-    public void run(MTransferConfiguration configuration,
-                    Environment environment) throws Exception {
+    public void run(final MTransferConfiguration configuration,
+                    final Environment environment) throws Exception {
 
         if (configuration.doRunMigrations()) {
             runMigrations(configuration, environment);
@@ -77,7 +77,8 @@ public class MTransferApplication extends Application<MTransferConfiguration> {
         environment.jersey().register(accountResource);
     }
 
-    private void runMigrations(MTransferConfiguration configuration, Environment environment) throws Exception {
+    private void runMigrations(final MTransferConfiguration configuration,
+                               final Environment environment) throws Exception {
         ManagedDataSource managedDataSource = configuration.getDataSourceFactory().build(environment.metrics(), "migrations");
 
         try (Connection connection = managedDataSource.getConnection()) {
@@ -86,12 +87,13 @@ public class MTransferApplication extends Application<MTransferConfiguration> {
         }
     }
 
-    private Jdbi createJdbi(MTransferConfiguration configuration, Environment environment) {
+    private Jdbi createJdbi(final MTransferConfiguration configuration,
+                            final Environment environment) {
         final JdbiFactory factory = new JdbiFactory();
         return factory.build(environment, configuration.getDataSourceFactory(), "hsqldb");
     }
 
-    private void startPersistenceServiceThread(PersistenceServiceImpl persistenceService) {
+    private void startPersistenceServiceThread(final PersistenceServiceImpl persistenceService) {
         Executors.newFixedThreadPool(1,
                 new ThreadFactoryBuilder().setNameFormat("persistence-service").build())
                 .submit(persistenceService);

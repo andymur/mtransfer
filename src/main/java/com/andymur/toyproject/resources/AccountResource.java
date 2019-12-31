@@ -24,7 +24,7 @@ public class AccountResource {
 
     @GET
     @Path("{id}")
-    public AccountState read(@PathParam("id") long id) {
+    public AccountState read(@PathParam("id") final long id) {
         LOGGER.info("read; id={}", id);
         return accountService.get(id);
     }
@@ -36,22 +36,22 @@ public class AccountResource {
     }
 
     @PUT
-    public AccountState put(AccountState accountState) {
+    public AccountState put(final AccountState accountState) {
         LOGGER.info("put; account={}", accountState);
         return accountService.put(accountState);
     }
 
     @POST
     @Path("{sourceAccountId}/{destinationAccountId}/{amount}")
-    public void transfer(@PathParam("sourceAccountId") long sourceAccountId,
-                         @PathParam("destinationAccountId") long destinationAccountId,
-                         @PathParam("amount")BigDecimal amount) {
+    public void transfer(@PathParam("sourceAccountId") final long sourceAccountId,
+                         @PathParam("destinationAccountId") final long destinationAccountId,
+                         @PathParam("amount") final BigDecimal amount) {
         accountService.transfer(sourceAccountId, destinationAccountId, amount);
     }
 
     @DELETE
     @Path("{id}")
-    public AccountState delete(@PathParam("id") long id) {
+    public AccountState delete(@PathParam("id") final long id) {
         LOGGER.info("delete; id={}", id);
         Optional<AccountState> deletedAccount = accountService.delete(id);
         return deletedAccount.orElse(AccountState.DEFAULT);
