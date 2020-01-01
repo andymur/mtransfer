@@ -1,4 +1,4 @@
-package com.andymur.toyproject.core.utils;
+package com.andymur.toyproject.core.util;
 
 import java.math.BigDecimal;
 

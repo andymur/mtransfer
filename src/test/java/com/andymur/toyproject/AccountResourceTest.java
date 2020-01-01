@@ -1,6 +1,8 @@
 package com.andymur.toyproject;
 
 import com.andymur.toyproject.core.AccountState;
+import com.andymur.toyproject.core.util.TransferOperation;
+import com.andymur.toyproject.util.RestClientHelper;
 import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
 import org.eclipse.jetty.http.HttpStatus;
@@ -24,6 +26,9 @@ public class AccountResourceTest {
     //TODO: test transfer, no sufficient funds, same account, lower & greater, to/from non existed account
     private static final String CONFIG_PATH = ResourceHelpers.resourceFilePath("mtransfer-test.yml");
     private static final Client CLIENT = new JerseyClientBuilder().build();
+
+    private static RestClientHelper REST_CLIENT_HELPER;
+
     private static final DropwizardTestSupport<MTransferConfiguration> SUPPORT =
             new DropwizardTestSupport<>(MTransferApplication.class,
                     CONFIG_PATH);
@@ -31,6 +36,7 @@ public class AccountResourceTest {
     @BeforeEach
     public void beforeClass() throws Exception {
         SUPPORT.before();
+        REST_CLIENT_HELPER = RestClientHelper.of("localhost", SUPPORT.getLocalPort());
     }
 
     @AfterEach
@@ -40,7 +46,7 @@ public class AccountResourceTest {
 
     @Test
     public void shouldReturnNoContentWhenRequestedAccountDoesNotExist() {
-        Response response = requestAccountStateResponse(CLIENT, 1);
+        Response response = REST_CLIENT_HELPER.requestAccountStateResponse(1L);
         assertThat(response.getStatus(), is(HttpStatus.NO_CONTENT_204));
     }
 
@@ -48,26 +54,18 @@ public class AccountResourceTest {
     public void shouldAddAccountWhenNotExisted() {
         final AccountState newAccount = new AccountState(1, BigDecimal.TEN);
 
-        Response putAccountMethodResponse = putAccountRequestResponse(CLIENT, newAccount);
-
-        assertThat(putAccountMethodResponse.getStatus(), is(HttpStatus.OK_200));
-        AccountState createdAccount = putAccountMethodResponse.readEntity(AccountState.class);
-        assertThat(createdAccount, is(newAccount));
-
-        Response getAccountMethodResponse = requestAccountStateResponse(CLIENT, 1);
-
-        assertThat(getAccountMethodResponse.getStatus(), is(HttpStatus.OK_200));
-        AccountState requestedAccount = getAccountMethodResponse.readEntity(AccountState.class);
+        REST_CLIENT_HELPER.createAccount(newAccount);
+        final AccountState requestedAccount = REST_CLIENT_HELPER.getAccount(1L);
         assertThat(requestedAccount, is(newAccount));
     }
 
     @Test
     public void shouldAddAccountsAndMakeTransfersCorrectly() {
-        createAccount(1L, new BigDecimal("100.00"));
-        createAccount(2L, new BigDecimal("200.00"));
-        transfer(1L, 2L,  new BigDecimal("50.00"));
-        AccountState firstAccountState = getAccount(1L);
-        AccountState secondAccountState = getAccount(2L);
+        REST_CLIENT_HELPER.createAccount(1L, new BigDecimal("100.00"));
+        REST_CLIENT_HELPER.createAccount(2L, new BigDecimal("200.00"));
+        REST_CLIENT_HELPER.transfer(TransferOperation.of(1L, 2L,  new BigDecimal("50.00")));
+        AccountState firstAccountState = REST_CLIENT_HELPER.getAccount(1L);
+        AccountState secondAccountState = REST_CLIENT_HELPER.getAccount(2L);
 
         Assert.assertThat("Fifty units must be withdrawn from the first account",
                 firstAccountState, is(new AccountState(1L, new BigDecimal("50.00"))));
@@ -78,72 +76,8 @@ public class AccountResourceTest {
 
     @Test
     public void shouldDeleteAccountWhenItDoesExist() {
-        final AccountState accountToDelete = new AccountState(1, BigDecimal.TEN);
-        putAccountRequestResponse(CLIENT, accountToDelete);
-
-        Response deletedAccountResponse = deleteAccountRequestResponse(CLIENT, 1);
-        assertThat(deletedAccountResponse.getStatus(), is(HttpStatus.OK_200));
+        final AccountState accountToDelete = new AccountState(1L, BigDecimal.TEN);
+        REST_CLIENT_HELPER.createAccount(accountToDelete);
+        REST_CLIENT_HELPER.deleteAccount(1L);
     }
-
-    private static long createAccount(final long id) {
-        return createAccount(id, new BigDecimal("0.00"));
-    }
-
-    private static long createAccount(final long id,
-                                      final BigDecimal initialAmount) {
-        Response response = putAccountRequestResponse(CLIENT, new AccountState(id, initialAmount));
-        Assert.assertThat("Account creation request has been successfully done",
-                response.getStatus(), is(HttpStatus.OK_200));
-        return id;
-    }
-
-    private static void transfer(final long sourceAccountId,
-                                 final long destinationAccountId,
-                                 final BigDecimal amountToTransfer) {
-        Response response = transferRequestResponse(CLIENT, sourceAccountId, destinationAccountId, amountToTransfer);
-        Assert.assertThat("Money transfer request has been successfully done",
-                response.getStatus(), is(HttpStatus.OK_200));
-    }
-
-    private static AccountState getAccount(final long accountId) {
-        Response response = requestAccountStateResponse(CLIENT, accountId);
-        Assert.assertThat("Account status request has been successfully done",
-                response.getStatus(), is(HttpStatus.OK_200));
-        return response.readEntity(AccountState.class);
-    }
-
-    private static Response transferRequestResponse(final Client client,
-                                                    final long sourceAccountId,
-                                                    final long destinationAccountId,
-                                                    final BigDecimal amountToTransfer) {
-        return client.target(
-                String.format("http://localhost:%d/account/%d/%d/%s", SUPPORT.getLocalPort(), sourceAccountId, destinationAccountId, amountToTransfer)
-        ).request()
-        .post(Entity.entity(Void.class, MediaType.APPLICATION_JSON_TYPE));
-    }
-
-    private static Response deleteAccountRequestResponse(final Client client,
-                                                         final long id) {
-        return client.target(
-                String.format("http://localhost:%d/account/%d", SUPPORT.getLocalPort(), id)
-        ).request()
-        .delete();
-    }
-
-    private static Response requestAccountStateResponse(final Client client,
-                                                        final long id) {
-        return client.target(
-                String.format("http://localhost:%d/account/%d", SUPPORT.getLocalPort(), id))
-                .request()
-                .get();
-    }
-
-    private static Response putAccountRequestResponse(final Client client,
-                                                      final AccountState account) {
-        return client.target(
-                String.format("http://localhost:%d/account/", SUPPORT.getLocalPort()))
-                .request()
-                .put(Entity.entity(account, MediaType.APPLICATION_JSON));
-    }
-
 }

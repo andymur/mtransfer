@@ -3,14 +3,13 @@ package com.andymur.toyproject.resources;
 import com.andymur.toyproject.core.AccountService;
 import com.andymur.toyproject.core.AccountState;
 import com.andymur.toyproject.core.TransferOperationsAuditLog;
-import com.andymur.toyproject.core.utils.TransferOperation;
+import com.andymur.toyproject.core.util.TransferOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
 @Path("/account")

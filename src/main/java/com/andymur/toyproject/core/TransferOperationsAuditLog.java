@@ -1,6 +1,6 @@
 package com.andymur.toyproject.core;
 
-import com.andymur.toyproject.core.utils.TransferOperation;
+import com.andymur.toyproject.core.util.TransferOperation;
 
 import java.util.ArrayList;
 import java.util.List;

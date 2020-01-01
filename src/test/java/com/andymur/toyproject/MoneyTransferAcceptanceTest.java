@@ -1,27 +1,13 @@
 package com.andymur.toyproject;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import com.andymur.toyproject.core.AccountState;
 import com.andymur.toyproject.core.TransferOperationsAuditLog;
-import com.andymur.toyproject.core.utils.Pair;
-import com.andymur.toyproject.core.utils.TransferOperation;
+import com.andymur.toyproject.core.util.Pair;
+import com.andymur.toyproject.core.util.TransferOperation;
+import com.andymur.toyproject.util.RestClientHelper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
-import org.eclipse.jetty.http.HttpStatus;
-import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +15,19 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.andymur.toyproject.core.utils.Generator.generateInt;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static com.andymur.toyproject.core.util.Generator.generateInt;
 import static org.hamcrest.CoreMatchers.is;
 
 //TODO: document me
@@ -49,10 +47,11 @@ public class MoneyTransferAcceptanceTest {
 
     private static final String CONFIG_PATH = ResourceHelpers.resourceFilePath("mtransfer-test-with-persistence.yml");
 
-    private static final Client CLIENT = new JerseyClientBuilder().build();
     private static final DropwizardTestSupport<MTransferConfiguration> SUPPORT =
             new DropwizardTestSupport<>(MTransferApplication.class,
                     CONFIG_PATH);
+
+    private static RestClientHelper REST_CLIENT_HELPER;
 
     private static final BigDecimal ONE_MILLION = new BigDecimal("1000000.00");
     private static final Pair<Integer, Integer> FROM_TO_ACCOUNT_NUMBER = Pair.of(10, 25);
@@ -65,6 +64,7 @@ public class MoneyTransferAcceptanceTest {
     public void beforeClass() throws Exception {
         SUPPORT.before();
         resourceAuditLog = ((MTransferApplication) SUPPORT.getApplication()).getResourceAuditLog();
+        REST_CLIENT_HELPER = RestClientHelper.of("localhost", SUPPORT.getLocalPort());
     }
 
     @AfterEach
@@ -86,12 +86,12 @@ public class MoneyTransferAcceptanceTest {
         LOGGER.info("Accounts are prepared for creation. {}", accountsToCreate);
 
         //creating accounts
-        createAllAccounts(CREATION_EXECUTOR_SERVICE, accountsToCreate);
+        createAllAccounts(REST_CLIENT_HELPER, CREATION_EXECUTOR_SERVICE, accountsToCreate);
 
         //making all the transfers
-        makeAllTransfers(TRANSFERRING_EXECUTOR_SERVICE, transferOperations);
+        makeAllTransfers(REST_CLIENT_HELPER, TRANSFERRING_EXECUTOR_SERVICE, transferOperations);
 
-        final List<AccountState> accountsActualFinalState = getAccountsActualState(accountsNumber);
+        final List<AccountState> accountsActualFinalState = getAccountsActualState(REST_CLIENT_HELPER, accountsNumber);
         LOGGER.info("Actual accounts final state. {}", accountsActualFinalState);
 
         LOGGER.info("Resource log transfer requests. {}", resourceAuditLog.stringifyLog());
@@ -105,41 +105,6 @@ public class MoneyTransferAcceptanceTest {
                 accountsActualFinalState);
     }
 
-    //TODO: extract transferRequestResponse like methods, see AccountResourceTest
-
-    /*************************************************/
-
-    private static AccountState getAccount(final long accountId) {
-        LOGGER.info("Fetching account in the test; accountId = {}", accountId);
-        Response response = requestAccountStateResponse(CLIENT, accountId);
-        Assert.assertThat("Account status request has been successfully done",
-                response.getStatus(), is(HttpStatus.OK_200));
-        AccountState result = response.readEntity(AccountState.class);
-        return result;
-    }
-
-    private static long createAccount(final AccountState accountState) {
-        LOGGER.info("Creating account in the test; account = {}", accountState);
-        Response response = putAccountRequestResponse(CLIENT, accountState);
-        Assert.assertThat("Account creation request has been successfully done",
-                response.getStatus(), is(HttpStatus.OK_200));
-        return accountState.getId();
-    }
-
-    private static void transfer(final TransferOperation transferOperation) {
-        Response response = transferRequestResponse(CLIENT, transferOperation.getSourceAccountId(),
-                transferOperation.getDestinationAccountId(),
-                transferOperation.getAmountToTransfer());
-        String transferResult = response.readEntity(String.class);
-
-        Assert.assertThat("Money transfer request has been successfully done",
-                response.getStatus(), is(HttpStatus.NO_CONTENT_204));
-        Assert.assertThat("Money transfer request has been successfully done",
-                transferResult, is("OK"));
-    }
-
-    /*************************************************/
-
     private String stringifyTransferOperations(final List<TransferOperation> transferOperations) {
         final List<String> resultList = new ArrayList<>(transferOperations.size());
         for (final TransferOperation operation : transferOperations) {
@@ -149,35 +114,8 @@ public class MoneyTransferAcceptanceTest {
         return String.join(", ", resultList);
     }
 
-    private static Response transferRequestResponse(final Client client,
-                                                    final long sourceAccountId,
-                                                    final long destinationAccountId,
-                                                    final BigDecimal amountToTransfer) {
-        Response result = client.target(
-                String.format("http://localhost:%d/account/%d/%d/%s", SUPPORT.getLocalPort(), sourceAccountId, destinationAccountId, amountToTransfer)
-        ).request()
-                .post(Entity.entity(Void.class, MediaType.APPLICATION_JSON_TYPE));
-        return result;
-    }
-
-    private static Response requestAccountStateResponse(final Client client,
-                                                        final long id) {
-        return client.target(
-                String.format("http://localhost:%d/account/%d", SUPPORT.getLocalPort(), id))
-                .request()
-                .get();
-    }
-
-    private static Response putAccountRequestResponse(final Client client,
-                                                      final AccountState account) {
-        return client.target(
-                String.format("http://localhost:%d/account/", SUPPORT.getLocalPort()))
-                .request()
-                .put(Entity.entity(account, MediaType.APPLICATION_JSON));
-    }
-
-    /*************************************************/
-    private static void createAllAccounts(final ExecutorService executorService,
+    private static void createAllAccounts(final RestClientHelper restClientHelper,
+                                          final ExecutorService executorService,
                                           final List<AccountState> accountsToCreate) throws InterruptedException {
 
         final CountDownLatch latch = new CountDownLatch(accountsToCreate.size());
@@ -185,7 +123,7 @@ public class MoneyTransferAcceptanceTest {
         for (final AccountState account : accountsToCreate) {
             executorService.submit(() -> {
                 try {
-                    createAccount(account);
+                    restClientHelper.createAccount(account);
                 } finally {
                     latch.countDown();
                 }
@@ -195,13 +133,14 @@ public class MoneyTransferAcceptanceTest {
         latch.await();
     }
 
-    private static void makeAllTransfers(final ExecutorService executorService,
+    private static void makeAllTransfers(final RestClientHelper restClientHelper,
+                                         final ExecutorService executorService,
                                          final List<TransferOperation> transferOperations) throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(transferOperations.size());
         for (final TransferOperation transferOperation : transferOperations) {
             executorService.submit(() -> {
                 try {
-                    transfer(transferOperation);
+                    restClientHelper.transfer(transferOperation);
                 } finally {
                     latch.countDown();
                 }
@@ -238,10 +177,11 @@ public class MoneyTransferAcceptanceTest {
         }
     }
 
-    private List<AccountState> getAccountsActualState(final int accountsNumber) {
+    private List<AccountState> getAccountsActualState(final RestClientHelper restClientHelper,
+                                                      final int accountsNumber) {
         final List<AccountState> result = new ArrayList<>(accountsNumber);
         for (int accountId = 1; accountId <= accountsNumber; accountId++) {
-            result.add(getAccount(accountId));
+            result.add(restClientHelper.getAccount(accountId));
         }
         return result;
     }

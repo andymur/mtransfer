@@ -5,8 +5,8 @@ import com.andymur.toyproject.core.AccountServiceImpl;
 import com.andymur.toyproject.core.AccountState;
 import com.andymur.toyproject.core.persistence.PersistenceService;
 import com.andymur.toyproject.core.persistence.operations.AccountOperation;
-import com.andymur.toyproject.core.utils.Pair;
-import com.andymur.toyproject.core.utils.TransferOperation;
+import com.andymur.toyproject.core.util.Pair;
+import com.andymur.toyproject.core.util.TransferOperation;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.andymur.toyproject.core.utils.Generator.generateInt;
+import static com.andymur.toyproject.core.util.Generator.generateInt;
 import static org.hamcrest.CoreMatchers.is;
 
 public class AccountServiceTest {
