@@ -8,6 +8,8 @@ AccountResourceTest
 
 MoneyTransferAcceptanceTest:
 	- Remove jersey methods to separate place and reuse from AccountResourceTest
+	- Add latch patch
+	- Add queue for POST operations
 
 AccountServiceTest
 	- Add me
@@ -23,4 +25,6 @@ Application
 	- Add normal read me
 
 Other things
-	- make transfer result to be enum (+corner cases for transfer)
+	- Make transfer result to be enum (+corner cases for transfer)
+	- Calculate preconditions for multi threaded tests
+	- Distinguish between integration (at least final acceptance) and unit tests

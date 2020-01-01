@@ -34,12 +34,6 @@ public class AccountResource {
         return accountService.get(id);
     }
 
-    @GET
-    public List<AccountState> list() {
-        LOGGER.info("list; ");
-        return accountService.list();
-    }
-
     @PUT
     public AccountState put(final AccountState accountState) {
         LOGGER.info("put; account={}", accountState);

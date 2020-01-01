@@ -61,8 +61,7 @@ public class AccountState {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         AccountState that = (AccountState) o;
-        return id == that.id &&
-                Objects.equals(amount, that.amount);
+        return id == that.id;
     }
 
     @Override

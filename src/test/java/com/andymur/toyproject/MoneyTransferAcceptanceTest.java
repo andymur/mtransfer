@@ -25,7 +25,6 @@ import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,8 +184,11 @@ public class MoneyTransferAcceptanceTest {
 
         for (final AccountState account : accountsToCreate) {
             executorService.submit(() -> {
-                latch.countDown();
-                createAccount(account);
+                try {
+                    createAccount(account);
+                } finally {
+                    latch.countDown();
+                }
             });
         }
 
@@ -198,8 +200,11 @@ public class MoneyTransferAcceptanceTest {
         final CountDownLatch latch = new CountDownLatch(transferOperations.size());
         for (final TransferOperation transferOperation : transferOperations) {
             executorService.submit(() -> {
-                latch.countDown();
-                transfer(transferOperation);
+                try {
+                    transfer(transferOperation);
+                } finally {
+                    latch.countDown();
+                }
             });
         }
 
@@ -243,7 +248,7 @@ public class MoneyTransferAcceptanceTest {
 
     private List<AccountState> calculateAccountsFinalState(final List<AccountState> initialAccountsState,
                                                            final List<TransferOperation> transferOperations) {
-        final Map<Long, BigDecimal> nettedOperations = nettedOperations(initialAccountsState.size(), transferOperations);
+        final Map<Long, BigDecimal> nettedOperations = calculateNettedOperations(initialAccountsState.size(), transferOperations);
         return applyNettedOperations(initialAccountsState, nettedOperations);
     }
 
@@ -253,8 +258,8 @@ public class MoneyTransferAcceptanceTest {
                 .collect(Collectors.toList());
     }
 
-    private Map<Long, BigDecimal> nettedOperations(final int accountNumber,
-                                                   final List<TransferOperation> transferOperations) {
+    private Map<Long, BigDecimal> calculateNettedOperations(final int accountNumber,
+                                                            final List<TransferOperation> transferOperations) {
         final Map<Long, BigDecimal> result = new HashMap<>(accountNumber);
 
         for (long accountId = 1; accountId <= accountNumber; accountId++) {

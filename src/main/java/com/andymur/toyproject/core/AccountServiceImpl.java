@@ -24,11 +24,7 @@ public class  AccountServiceImpl implements AccountService {
 
     @Override
     public AccountState get(final long id) {
-        //TODO: consider raising an exception instead of returning default value
-        final AccountState account = accounts.getOrDefault(id, AccountState.DEFAULT);
-        synchronized (account) {
-            return account;
-        }
+        return accounts.get(id);
     }
 
     @Override
@@ -46,11 +42,6 @@ public class  AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<AccountState> list() {
-        return new ArrayList<>(accounts.values());
-    }
-
-    @Override
     public void transfer(final long sourceAccountId,
                          final long destinationAccountId,
                          final BigDecimal amountToTransfer) {
@@ -62,40 +53,35 @@ public class  AccountServiceImpl implements AccountService {
         }
     }
 
-    @Override
-    public void withdraw(final long accountId,
-                         final BigDecimal amountToWithdraw) {
-        synchronized (get(accountId)) {
-            amountToAdd(accountId, amountToWithdraw.negate());
+    private void lockAndTransfer(final long lowerAccountId,
+                          final long upperAccountId,
+                          final BigDecimal amountToTransfer) {
+        final AccountState lowerAccount = accounts.get(lowerAccountId);
+        final AccountState upperAccount = accounts.get(upperAccountId);
+        synchronized (lowerAccount) {
+           synchronized (upperAccount) {
+                withdraw(lowerAccountId, amountToTransfer);
+                deposit(upperAccountId, amountToTransfer);
+            }
         }
     }
 
-    @Override
-    public void deposit(final long accountId,
-                        final BigDecimal amountToAdd) {
-        synchronized (get(accountId)) {
-            amountToAdd(accountId, amountToAdd);
-        }
+    private void withdraw(final long accountId,
+                          final BigDecimal amountToWithdraw) {
+        amountToAdd(accountId, amountToWithdraw.negate());
     }
 
-    @Override
-    public void amountToAdd(final long accountId,
-                            final BigDecimal amountToAdd) {
+    private void deposit(final long accountId,
+                         final BigDecimal amountToAdd) {
+        amountToAdd(accountId, amountToAdd);
+    }
+
+    private void amountToAdd(final long accountId,
+                             final BigDecimal amountToAdd) {
         final BigDecimal oldAmount = get(accountId).getAmount();
         final BigDecimal newAmount = oldAmount.add(amountToAdd);
 
         accounts.put(accountId, new AccountState(accountId, newAmount));
         persistenceService.addOperation(UpdateAccountOperation.of(accountId, newAmount));
-    }
-
-    private void lockAndTransfer(final long lowerAccountId,
-                          final long upperAccountId,
-                          final BigDecimal amountToTransfer) {
-        synchronized (get(lowerAccountId)) {
-           synchronized (get(upperAccountId)) {
-                withdraw(lowerAccountId, amountToTransfer);
-                deposit(upperAccountId, amountToTransfer);
-            }
-        }
     }
 }

@@ -39,11 +39,9 @@ public class AccountResourceTest {
     }
 
     @Test
-    public void shouldReturnDefaultAccountWhenRequestedAccountDoesNotExist() {
+    public void shouldReturnNoContentWhenRequestedAccountDoesNotExist() {
         Response response = requestAccountStateResponse(CLIENT, 1);
-        assertThat(response.getStatus(), is(HttpStatus.OK_200));
-        AccountState requestedAccount = response.readEntity(AccountState.class);
-        assertThat(requestedAccount, is(AccountState.DEFAULT));
+        assertThat(response.getStatus(), is(HttpStatus.NO_CONTENT_204));
     }
 
     @Test
