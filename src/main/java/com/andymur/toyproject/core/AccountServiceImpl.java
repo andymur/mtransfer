@@ -1,9 +1,9 @@
 package com.andymur.toyproject.core;
 
 import com.andymur.toyproject.core.persistence.PersistenceService;
-import com.andymur.toyproject.core.persistence.PersistenceServiceImpl;
+import com.andymur.toyproject.core.persistence.operations.AddAccountOperation;
+import com.andymur.toyproject.core.persistence.operations.DeleteAccountOperation;
 import com.andymur.toyproject.core.persistence.operations.UpdateAccountOperation;
-import com.andymur.toyproject.db.AccountRepository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,29 +15,34 @@ import java.util.concurrent.ConcurrentHashMap;
 public class  AccountServiceImpl implements AccountService {
 
     private final Map<Long, AccountState> accounts = new ConcurrentHashMap<>();
+
     private final PersistenceService persistenceService;
 
-    public AccountServiceImpl(PersistenceService persistenceService) {
+    public AccountServiceImpl(final PersistenceService persistenceService) {
         this.persistenceService = persistenceService;
     }
 
     @Override
     public AccountState get(final long id) {
         //TODO: consider raising an exception instead of returning default value
-        return accounts.getOrDefault(id, AccountState.DEFAULT);
+        final AccountState account = accounts.getOrDefault(id, AccountState.DEFAULT);
+        synchronized (account) {
+            return account;
+        }
     }
 
     @Override
     public AccountState put(final AccountState accountState) {
-        //TODO: use persistence
         accounts.put(accountState.getId(), accountState);
+        persistenceService.addOperation(AddAccountOperation.of(accountState.getId(), accountState.getAmount()));
         return accountState;
     }
 
     @Override
     public Optional<AccountState> delete(final long id) {
-        //TODO: use persistence
-        return Optional.ofNullable(accounts.remove(id));
+        Optional<AccountState> result = Optional.ofNullable(accounts.remove(id));
+        persistenceService.addOperation(DeleteAccountOperation.of(id));
+        return result;
     }
 
     @Override
@@ -60,28 +65,34 @@ public class  AccountServiceImpl implements AccountService {
     @Override
     public void withdraw(final long accountId,
                          final BigDecimal amountToWithdraw) {
-        amountToAdd(accountId, amountToWithdraw.negate());
+        synchronized (get(accountId)) {
+            amountToAdd(accountId, amountToWithdraw.negate());
+        }
     }
 
     @Override
     public void deposit(final long accountId,
                         final BigDecimal amountToAdd) {
-        amountToAdd(accountId, amountToAdd);
+        synchronized (get(accountId)) {
+            amountToAdd(accountId, amountToAdd);
+        }
     }
 
     @Override
     public void amountToAdd(final long accountId,
                             final BigDecimal amountToAdd) {
-        //TODO: use persistence
-        get(accountId).addAmount(amountToAdd);
+        final BigDecimal oldAmount = get(accountId).getAmount();
+        final BigDecimal newAmount = oldAmount.add(amountToAdd);
+
+        accounts.put(accountId, new AccountState(accountId, newAmount));
+        persistenceService.addOperation(UpdateAccountOperation.of(accountId, newAmount));
     }
 
     private void lockAndTransfer(final long lowerAccountId,
                           final long upperAccountId,
                           final BigDecimal amountToTransfer) {
-        //TODO: consider using ReadWriteLock
         synchronized (get(lowerAccountId)) {
-            synchronized (get(upperAccountId)) {
+           synchronized (get(upperAccountId)) {
                 withdraw(lowerAccountId, amountToTransfer);
                 deposit(upperAccountId, amountToTransfer);
             }

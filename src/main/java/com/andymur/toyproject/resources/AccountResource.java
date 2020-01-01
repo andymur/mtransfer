@@ -1,8 +1,9 @@
 package com.andymur.toyproject.resources;
 
 import com.andymur.toyproject.core.AccountService;
-import com.andymur.toyproject.core.AccountServiceImpl;
 import com.andymur.toyproject.core.AccountState;
+import com.andymur.toyproject.core.TransferOperationsAuditLog;
+import com.andymur.toyproject.core.utils.TransferOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,12 +15,16 @@ import java.util.Optional;
 
 @Path("/account")
 @Produces(MediaType.APPLICATION_JSON)
+
 public class AccountResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccountState.class);
     private final AccountService accountService;
+    private final TransferOperationsAuditLog transferOperationsAuditLog;
 
-    public AccountResource(AccountService accountService) {
+    public AccountResource(final AccountService accountService,
+                           final TransferOperationsAuditLog transferOperationsAuditLog) {
         this.accountService = accountService;
+        this.transferOperationsAuditLog = transferOperationsAuditLog;
     }
 
     @GET
@@ -43,10 +48,21 @@ public class AccountResource {
 
     @POST
     @Path("{sourceAccountId}/{destinationAccountId}/{amount}")
-    public void transfer(@PathParam("sourceAccountId") final long sourceAccountId,
+    //TODO: replace returning result with enum
+    public String transfer(@PathParam("sourceAccountId") final long sourceAccountId,
                          @PathParam("destinationAccountId") final long destinationAccountId,
-                         @PathParam("amount") final BigDecimal amount) {
-        accountService.transfer(sourceAccountId, destinationAccountId, amount);
+                         @PathParam("amount") final BigDecimal amountToTransfer) {
+        LOGGER.info("transfer; fromAccountId = {}, toACcountId = {} amountToTransfer = {}",
+                sourceAccountId,
+                destinationAccountId,
+                amountToTransfer);
+
+        transferOperationsAuditLog.addOperation(
+                new TransferOperation(sourceAccountId, destinationAccountId, amountToTransfer)
+        );
+
+        accountService.transfer(sourceAccountId, destinationAccountId, amountToTransfer);
+        return "OK";
     }
 
     @DELETE

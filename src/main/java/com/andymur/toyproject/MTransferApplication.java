@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.util.concurrent.Executors;
 
 import com.andymur.toyproject.core.AccountServiceImpl;
+import com.andymur.toyproject.core.TransferOperationsAuditLog;
 import com.andymur.toyproject.core.persistence.PersistenceServiceImpl;
 import com.andymur.toyproject.core.persistence.operations.OperationHandler;
 import com.andymur.toyproject.db.AccountRepository;
@@ -23,19 +24,9 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 import org.jdbi.v3.core.Jdbi;
 
 public class MTransferApplication extends Application<MTransferConfiguration> {
-    //TODO: fix health check warning
-    //TODO: check sub configuration
-    //TODO: check guice?
 
-    //TODO: Add seq generator
-    //TODO: Polish
-    //TODO: Integration test with persistence (ideally with random multi threading)
-    //TODO: Add documentation and pretty logging in the tests
-    //TODO: Add banner
-    // https://github.com/dropwizard/dropwizard/tree/master/dropwizard-example
-    // https://www.dropwizard.io/en/stable/getting-started.html
-    // https://www.dropwizard.io/en/stable/manual/core.html#man-core-commands-configured
-    // https://www.dropwizard.io/en/stable/manual/testing.html
+    private final TransferOperationsAuditLog resourceAuditLog = new TransferOperationsAuditLog();
+
     public static void main( final String[] args ) throws Exception {
         new MTransferApplication().run(args);
     }
@@ -71,10 +62,13 @@ public class MTransferApplication extends Application<MTransferConfiguration> {
         startPersistenceServiceThread(persistenceService);
 
         final AccountServiceImpl accountService = new AccountServiceImpl(persistenceService);
-
-        final AccountResource accountResource = new AccountResource(accountService);
+        final AccountResource accountResource = new AccountResource(accountService, resourceAuditLog);
 
         environment.jersey().register(accountResource);
+    }
+
+    public TransferOperationsAuditLog getResourceAuditLog() {
+        return resourceAuditLog;
     }
 
     private void runMigrations(final MTransferConfiguration configuration,

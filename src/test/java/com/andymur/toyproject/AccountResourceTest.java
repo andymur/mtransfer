@@ -19,10 +19,9 @@ import java.math.BigDecimal;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-//TODO: document me
+//TODO: Add documentation and pretty logging in the tests
 public class AccountResourceTest {
     //TODO: test transfer, no sufficient funds, same account, lower & greater, to/from non existed account
-    //TODO: Add persistence to AccountService (mock it here)
     private static final String CONFIG_PATH = ResourceHelpers.resourceFilePath("mtransfer-test.yml");
     private static final Client CLIENT = new JerseyClientBuilder().build();
     private static final DropwizardTestSupport<MTransferConfiguration> SUPPORT =
@@ -105,7 +104,7 @@ public class AccountResourceTest {
                                  final BigDecimal amountToTransfer) {
         Response response = transferRequestResponse(CLIENT, sourceAccountId, destinationAccountId, amountToTransfer);
         Assert.assertThat("Money transfer request has been successfully done",
-                response.getStatus(), is(HttpStatus.NO_CONTENT_204));
+                response.getStatus(), is(HttpStatus.OK_200));
     }
 
     private static AccountState getAccount(final long accountId) {

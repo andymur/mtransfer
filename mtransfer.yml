@@ -24,6 +24,3 @@ database:
 # Logging settings.
 logging:
   level: INFO
-  loggers:
-    #override
-    "com.andymur.toyproject.resources.AccountResource": DEBUG

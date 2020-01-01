@@ -1,4 +1,6 @@
-package com.andymur.toyproject.utils;
+package com.andymur.toyproject.core.utils;
+
+import com.andymur.toyproject.core.utils.Pair;
 
 import java.util.concurrent.ThreadLocalRandom;
 

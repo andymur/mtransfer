@@ -1,4 +1,4 @@
-package com.andymur.toyproject.utils;
+package com.andymur.toyproject.core.utils;
 
 public class Pair<F, S> {
 

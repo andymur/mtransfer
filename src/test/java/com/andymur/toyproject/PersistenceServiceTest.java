@@ -34,8 +34,10 @@ import java.util.concurrent.Executors;
 
 import static org.hamcrest.CoreMatchers.is;
 
-//TODO: document me
+//TODO: Add documentation and pretty logging in the tests
 public class PersistenceServiceTest {
+
+    private static int NUMBER_OF_THREADS = 5;
 
     private static String DB_URL = "jdbc:hsqldb:mem:mtransfer";
     private static String DB_USERNAME = "sa";
@@ -45,17 +47,15 @@ public class PersistenceServiceTest {
     private static BigDecimal E_AMOUNT = new BigDecimal("2.71");
 
     private PersistenceService persistenceService;
-    private OperationHandler operationHandler;
-    private AccountRepository accountRepository;
 
     @BeforeEach
     public void beforeClass() throws Exception {
         setUpDatabase();
-        accountRepository = new AccountRepository(getJdbi());
-        operationHandler = new OperationHandler(accountRepository);
+        final AccountRepository accountRepository = new AccountRepository(getJdbi());
+        final OperationHandler operationHandler = new OperationHandler(accountRepository);
         persistenceService = new PersistenceServiceImpl(accountRepository, operationHandler);
 
-        Executors.newFixedThreadPool(1,
+        Executors.newFixedThreadPool(NUMBER_OF_THREADS,
                 new ThreadFactoryBuilder().setNameFormat("persistence-service").build())
                 .submit(persistenceService);
     }
@@ -81,8 +81,6 @@ public class PersistenceServiceTest {
         Assert.assertThat("Account exists and details are correct",
                 accountState, is(new AccountState(1L, PI_AMOUNT)));
     }
-
-    //shouldNotAddAccountWhenAccountWithSameIdExists
 
     @Test
     public void shouldUpdateAccountWhenItDoesExist() {
@@ -113,8 +111,6 @@ public class PersistenceServiceTest {
         Assert.assertThat("Updated account details are correct",
                 updatedAccountState, is(new AccountState(1L, E_AMOUNT)));
     }
-
-    //shouldNotUpdateAccountWhenItDoesNotExist
 
     @Test
     public void shouldDeleteAccountWhenItDoesExist() {

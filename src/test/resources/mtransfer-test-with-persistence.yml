@@ -1,4 +1,4 @@
-runMigrationsOnStart: false
+runMigrationsOnStart: true
 
 server:
   applicationConnectors:

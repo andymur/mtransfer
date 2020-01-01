@@ -1,4 +1,4 @@
-package com.andymur.toyproject.utils;
+package com.andymur.toyproject.core.utils;
 
 import java.math.BigDecimal;
 
@@ -7,9 +7,9 @@ public class TransferOperation {
 	private final long destinationAccountId;
 	private final BigDecimal amountToTransfer;
 
-	private TransferOperation(final long sourceAccountId,
-							  final long destinationAccountId,
-							  final BigDecimal amountToTransfer) {
+	public TransferOperation(final long sourceAccountId,
+							 final long destinationAccountId,
+							 final BigDecimal amountToTransfer) {
 		this.sourceAccountId = sourceAccountId;
 		this.destinationAccountId = destinationAccountId;
 		this.amountToTransfer = amountToTransfer;
