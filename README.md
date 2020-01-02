@@ -4,7 +4,6 @@
 
 # AccountResourceTest
 * Add corner cases (T)
-* Add persistence mock (T)
 
 # AccountServiceTest
 * Add corner cases for transfer (T)
