@@ -12,7 +12,6 @@ server:
 
 
 # Database settings.
-# TODO: how to use with in memory db?
 database:
   driverClass: org.hsqldb.jdbc.JDBCDriver
   user: sa

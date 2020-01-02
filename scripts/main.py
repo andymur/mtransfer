@@ -15,7 +15,7 @@ def in_res_ops(acc_id):
     return in_ops(res_ops, acc_id)
 
 def out_res_ops(acc_id):
-    return in_ops(res_ops, acc_id)
+    return out_ops(res_ops, acc_id)
 
 def in_ops(ops, acc_id):
     return [op for op in ops if op[1] == acc_id]

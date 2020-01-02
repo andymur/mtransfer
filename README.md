@@ -3,7 +3,7 @@
 * Add some for interfaces (F)
 
 # Other things
-* Distinguish between integration (at least final acceptance) and unit tests (T)
+* Test real server
 
 # Instructions
 * Make sure port is accessible 
