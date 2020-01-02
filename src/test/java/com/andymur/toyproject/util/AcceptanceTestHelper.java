@@ -1,22 +1,23 @@
 package com.andymur.toyproject.util;
 
-import com.andymur.toyproject.core.AccountState;
-import com.andymur.toyproject.core.persistence.PersistenceService;
-import com.andymur.toyproject.core.persistence.operations.AccountOperation;
-import com.andymur.toyproject.core.util.Pair;
-import com.andymur.toyproject.core.util.TransferOperation;
-import org.junit.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import com.andymur.toyproject.core.AccountState;
+import com.andymur.toyproject.core.util.Pair;
+import com.andymur.toyproject.core.util.TransferOperation;
+import org.junit.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.andymur.toyproject.core.util.Generator.generateInt;
 import static org.hamcrest.CoreMatchers.is;
@@ -104,12 +105,16 @@ public class AcceptanceTestHelper {
         int idx = 0;
         for (final AccountState accountFinalState : accountsExpectedFinalState) {
             final AccountState actualAccountState = accountsActualFinalState.get(idx++);
-            if (raiseOnlyWarning && !accountFinalState.equals(actualAccountState)) {
-                LOGGER.warn("Actual and expected account states must be equal to each other, actual = {}, expected = {}",
-                        actualAccountState, accountFinalState);
+
+            Assert.assertThat("Actual and expected accounts' ids must be equal to each other",
+                    actualAccountState.getId(), is(accountFinalState.getId()));
+
+            if (raiseOnlyWarning && !accountFinalState.getAmount().equals(actualAccountState.getAmount())) {
+                LOGGER.warn("Actual and expected accounts' amounts must be equal to each other, actual = {}, expected = {}",
+                        actualAccountState.getAmount(), accountFinalState.getAmount());
             } else {
-                Assert.assertThat("Actual and expected account states must be equal to each other",
-                        actualAccountState, is(accountFinalState));
+                Assert.assertThat("Actual and expected accounts' amounts must be equal to each other",
+                        actualAccountState.getAmount(), is(accountFinalState.getAmount()));
             }
         }
     }
@@ -121,36 +126,6 @@ public class AcceptanceTestHelper {
                     operation.getSourceAccountId(), operation.getDestinationAccountId(), operation.getAmountToTransfer()));
         }
         return String.join(", ", resultList);
-    }
-
-    public static PersistenceService createPersistenceServiceMock() {
-            return new PersistenceService() {
-                @Override
-                public String addOperation(AccountOperation operation) {
-                    //no op
-                    return UUID.randomUUID().toString();
-                }
-
-                @Override
-                public AccountOperation.Status getOperationStatus(String operationId) {
-                    return AccountOperation.Status.DONE;
-                }
-
-                @Override
-                public List<AccountState> list() {
-                    return Collections.emptyList();
-                }
-
-                @Override
-                public Optional<AccountState> find(long id) {
-                    return Optional.empty();
-                }
-
-                @Override
-                public void run() {
-                    // no op
-                }
-            };
     }
 
     private static Map<Long, BigDecimal> calculateNettedOperations(final int accountNumber,

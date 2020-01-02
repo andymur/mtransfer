@@ -17,6 +17,9 @@ public class MTransferConfiguration extends Configuration {
 	@NotNull
 	private boolean doRunMigrations;
 
+	@Valid
+	private boolean mockPersistence;
+
 	@JsonProperty("database")
 	public DataSourceFactory getDataSourceFactory() {
 		return database;
@@ -36,5 +39,15 @@ public class MTransferConfiguration extends Configuration {
 	@JsonProperty("runMigrationsOnStart")
 	public void setDoRunMigrations(final boolean doRunMigrations) {
 		this.doRunMigrations = doRunMigrations;
+	}
+
+	@JsonProperty("mockPersistence")
+	public boolean mockPersistence() {
+		return mockPersistence;
+	}
+
+	@JsonProperty("mockPersistence")
+	public void setMockPersistence(final boolean mockPersistence) {
+		this.mockPersistence = mockPersistence;
 	}
 }

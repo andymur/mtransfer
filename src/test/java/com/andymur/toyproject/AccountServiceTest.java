@@ -1,10 +1,15 @@
 package com.andymur.toyproject;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.andymur.toyproject.core.AccountService;
 import com.andymur.toyproject.core.AccountServiceImpl;
 import com.andymur.toyproject.core.AccountState;
-import com.andymur.toyproject.core.persistence.PersistenceService;
-import com.andymur.toyproject.core.persistence.operations.AccountOperation;
+import com.andymur.toyproject.core.persistence.PersistenceServiceMock;
 import com.andymur.toyproject.core.util.Pair;
 import com.andymur.toyproject.core.util.TransferOperation;
 import com.andymur.toyproject.util.AcceptanceTestHelper;
@@ -16,13 +21,12 @@ import org.junit.jupiter.api.RepeatedTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import static com.andymur.toyproject.core.util.Generator.generateInt;
-import static com.andymur.toyproject.util.AcceptanceTestHelper.*;
+import static com.andymur.toyproject.util.AcceptanceTestHelper.calculateAccountsFinalState;
+import static com.andymur.toyproject.util.AcceptanceTestHelper.checkAllMoneyTransferredCorrectly;
+import static com.andymur.toyproject.util.AcceptanceTestHelper.generateTransferOperations;
+import static com.andymur.toyproject.util.AcceptanceTestHelper.prepareAccountsToCreate;
+import static com.andymur.toyproject.util.AcceptanceTestHelper.stringifyTransferOperations;
 import static org.hamcrest.CoreMatchers.is;
 
 public class AccountServiceTest {
@@ -46,7 +50,7 @@ public class AccountServiceTest {
 
     @BeforeEach
     public void setUp() {
-        accountService = new AccountServiceImpl(createPersistenceServiceMock());
+        accountService = new AccountServiceImpl(new PersistenceServiceMock());
     }
 
     @AfterEach
@@ -72,6 +76,9 @@ public class AccountServiceTest {
 
         List<AccountState> accountsExpectedFinalState = calculateAccountsFinalState(accountsToCreate, transferOperations);
         List<AccountState> accountsActualFinalState = accountsActualFinalState(accountsNumber, accountService);
+
+        LOGGER.debug("Accounts expected final state: {}", accountsExpectedFinalState);
+        LOGGER.debug("Accounts actual final state: {}", accountsActualFinalState);
 
         checkAllMoneyTransferredCorrectly(accountsExpectedFinalState, accountsActualFinalState);
     }

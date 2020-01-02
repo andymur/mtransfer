@@ -1,5 +1,11 @@
 package com.andymur.toyproject;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.andymur.toyproject.core.AccountState;
 import com.andymur.toyproject.core.TransferOperationsAuditLog;
 import com.andymur.toyproject.core.util.Pair;
@@ -11,18 +17,16 @@ import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.RepeatedTest;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import static com.andymur.toyproject.core.util.Generator.generateInt;
-import static com.andymur.toyproject.util.AcceptanceTestHelper.*;
+import static com.andymur.toyproject.util.AcceptanceTestHelper.calculateAccountsFinalState;
+import static com.andymur.toyproject.util.AcceptanceTestHelper.checkAllMoneyTransferredCorrectly;
+import static com.andymur.toyproject.util.AcceptanceTestHelper.generateTransferOperations;
+import static com.andymur.toyproject.util.AcceptanceTestHelper.prepareAccountsToCreate;
+import static com.andymur.toyproject.util.AcceptanceTestHelper.stringifyTransferOperations;
 
 //TODO: document me
 public class MoneyTransferAcceptanceTest {
@@ -39,7 +43,7 @@ public class MoneyTransferAcceptanceTest {
             new ThreadFactoryBuilder().setNameFormat("transfer-money-%d").build());
     ;
 
-    private static final String CONFIG_PATH = ResourceHelpers.resourceFilePath("mtransfer-test-with-persistence.yml");
+    private static final String CONFIG_PATH = ResourceHelpers.resourceFilePath("mtransfer-test.yml");
 
     private static final DropwizardTestSupport<MTransferConfiguration> SUPPORT =
             new DropwizardTestSupport<>(MTransferApplication.class,
@@ -67,7 +71,7 @@ public class MoneyTransferAcceptanceTest {
     }
 
 
-    @RepeatedTest(10)
+    @Test
     public void shouldHaveCorrectAccountDetailsAfterMoneyTransferring() throws InterruptedException {
 
         final int accountsNumber = generateInt(FROM_TO_ACCOUNT_NUMBER);

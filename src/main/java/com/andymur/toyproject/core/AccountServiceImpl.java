@@ -1,16 +1,14 @@
 package com.andymur.toyproject.core;
 
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.andymur.toyproject.core.persistence.PersistenceService;
 import com.andymur.toyproject.core.persistence.operations.AddAccountOperation;
 import com.andymur.toyproject.core.persistence.operations.DeleteAccountOperation;
 import com.andymur.toyproject.core.persistence.operations.UpdateAccountOperation;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class  AccountServiceImpl implements AccountService {
 
@@ -78,7 +76,7 @@ public class  AccountServiceImpl implements AccountService {
 
     private void amountToAdd(final long accountId,
                              final BigDecimal amountToAdd) {
-        final BigDecimal oldAmount = get(accountId).getAmount();
+        final BigDecimal oldAmount = accounts.get(accountId).getAmount();
         final BigDecimal newAmount = oldAmount.add(amountToAdd);
 
         accounts.put(accountId, new AccountState(accountId, newAmount));
