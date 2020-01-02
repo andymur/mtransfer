@@ -2,8 +2,10 @@ package com.andymur.toyproject.resources;
 
 import com.andymur.toyproject.core.AccountService;
 import com.andymur.toyproject.core.AccountState;
+import com.andymur.toyproject.core.TransferOperationResult;
 import com.andymur.toyproject.core.TransferOperationsAuditLog;
 import com.andymur.toyproject.core.util.TransferOperation;
+import org.omg.PortableInterceptor.SUCCESSFUL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +13,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
 import java.util.Optional;
+
+import static com.andymur.toyproject.core.TransferOperationResult.Status.SUCCESS;
 
 @Path("/account")
 @Produces(MediaType.APPLICATION_JSON)
@@ -41,21 +45,26 @@ public class AccountResource {
 
     @POST
     @Path("{sourceAccountId}/{destinationAccountId}/{amount}")
-    //TODO: replace returning result with enum
-    public String transfer(@PathParam("sourceAccountId") final long sourceAccountId,
-                         @PathParam("destinationAccountId") final long destinationAccountId,
-                         @PathParam("amount") final BigDecimal amountToTransfer) {
+    public TransferOperationResult transfer(@PathParam("sourceAccountId") final long sourceAccountId,
+                                            @PathParam("destinationAccountId") final long destinationAccountId,
+                                            @PathParam("amount") final BigDecimal amountToTransfer) {
         LOGGER.info("transfer; fromAccountId = {}, toACcountId = {} amountToTransfer = {}",
                 sourceAccountId,
                 destinationAccountId,
                 amountToTransfer);
 
-        transferOperationsAuditLog.addOperation(
-                new TransferOperation(sourceAccountId, destinationAccountId, amountToTransfer)
-        );
 
-        accountService.transfer(sourceAccountId, destinationAccountId, amountToTransfer);
-        return "OK";
+        final TransferOperationResult operationResult = accountService.transfer(sourceAccountId, destinationAccountId, amountToTransfer);
+
+        if (operationResult.getStatus() == SUCCESS) {
+            transferOperationsAuditLog.addOperation(
+                    new TransferOperation(sourceAccountId, destinationAccountId, amountToTransfer)
+            );
+        } else {
+            LOGGER.warn("transfer; operation has failed", operationResult);
+        }
+
+        return operationResult;
     }
 
     @DELETE

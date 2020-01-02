@@ -5,7 +5,7 @@ import java.util.Optional;
 //TODO: document me
 public interface AccountService {
 
-    void transfer(long sourceAccountId, long destinationAccountId, BigDecimal amountToTransfer);
+    TransferOperationResult transfer(long sourceAccountId, long destinationAccountId, BigDecimal amountToTransfer);
 
     AccountState get(long id);
 

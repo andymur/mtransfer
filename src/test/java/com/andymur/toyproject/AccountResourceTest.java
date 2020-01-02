@@ -1,6 +1,11 @@
 package com.andymur.toyproject;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.core.Response;
+import java.math.BigDecimal;
+
 import com.andymur.toyproject.core.AccountState;
+import com.andymur.toyproject.core.TransferOperationResult;
 import com.andymur.toyproject.core.util.TransferOperation;
 import com.andymur.toyproject.util.RestClientHelper;
 import io.dropwizard.testing.DropwizardTestSupport;
@@ -12,18 +17,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.math.BigDecimal;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-//TODO: Add documentation and pretty logging in the tests
 public class AccountResourceTest {
-    //TODO: test transfer, no sufficient funds, same account, lower & greater, to/from non existed account
+
     private static final String CONFIG_PATH = ResourceHelpers.resourceFilePath("mtransfer-test.yml");
     private static final Client CLIENT = new JerseyClientBuilder().build();
 
@@ -72,6 +70,24 @@ public class AccountResourceTest {
 
         Assert.assertThat("Fifty units must be added to the second account", secondAccountState,
                 is(new AccountState(2L, new BigDecimal("250.00"))));
+    }
+
+    @Test
+    public void shouldShowFailedStatusWhenTryingToTransferMoreMoneyThanAccountHas() {
+        REST_CLIENT_HELPER.createAccount(1L, new BigDecimal("100.00"));
+        REST_CLIENT_HELPER.createAccount(2L, new BigDecimal("200.00"));
+
+        REST_CLIENT_HELPER.transfer(TransferOperation.of(1L, 2L,  new BigDecimal("150.00")),
+                result -> result.getStatus() == TransferOperationResult.Status.FAILED);
+
+        AccountState firstAccountState = REST_CLIENT_HELPER.getAccount(1L);
+        AccountState secondAccountState = REST_CLIENT_HELPER.getAccount(2L);
+
+        Assert.assertThat("One hundred and fifty units must not be withdrawn from the first account",
+                firstAccountState, is(new AccountState(1L, new BigDecimal("100.00"))));
+
+        Assert.assertThat("One hundred and fifty units must not be added to the second account", secondAccountState,
+                is(new AccountState(2L, new BigDecimal("200.00"))));
     }
 
     @Test

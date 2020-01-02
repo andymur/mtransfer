@@ -9,8 +9,16 @@ import com.andymur.toyproject.core.persistence.PersistenceService;
 import com.andymur.toyproject.core.persistence.operations.AddAccountOperation;
 import com.andymur.toyproject.core.persistence.operations.DeleteAccountOperation;
 import com.andymur.toyproject.core.persistence.operations.UpdateAccountOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static com.andymur.toyproject.core.TransferOperationResult.failed;
+import static com.andymur.toyproject.core.TransferOperationResult.success;
 
 public class  AccountServiceImpl implements AccountService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceImpl.class);
+
+    private static final String OK = "OK";
 
     private final Map<Long, AccountState> accounts = new ConcurrentHashMap<>();
 
@@ -40,14 +48,18 @@ public class  AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void transfer(final long sourceAccountId,
+    public TransferOperationResult transfer(final long sourceAccountId,
                          final long destinationAccountId,
                          final BigDecimal amountToTransfer) {
-        //TODO: add exceptions handling (e.g. account not found, source has no sufficient funds etc)
-        if (sourceAccountId < destinationAccountId) {
-            lockAndTransfer(sourceAccountId, destinationAccountId, amountToTransfer);
-        } else {
-            lockAndTransfer(destinationAccountId, sourceAccountId, amountToTransfer.negate());
+        try {
+            if (sourceAccountId < destinationAccountId) {
+                lockAndTransfer(sourceAccountId, destinationAccountId, amountToTransfer);
+            } else {
+                lockAndTransfer(destinationAccountId, sourceAccountId, amountToTransfer.negate());
+            }
+            return success(OK);
+        } catch (Exception e) {
+            return failed(e.getMessage());
         }
     }
 
@@ -78,6 +90,13 @@ public class  AccountServiceImpl implements AccountService {
                              final BigDecimal amountToAdd) {
         final BigDecimal oldAmount = accounts.get(accountId).getAmount();
         final BigDecimal newAmount = oldAmount.add(amountToAdd);
+
+        if (newAmount.compareTo(BigDecimal.ZERO) < 0) {
+            LOGGER.warn("Greater amount cannot be withdrawn. accountId = {}, current amount = {}, amount to withdraw = {}",
+                    accountId, oldAmount,  amountToAdd);
+
+            throw new IllegalStateException("Amount to withdraw is greater than account has.");
+        }
 
         accounts.put(accountId, new AccountState(accountId, newAmount));
         persistenceService.addOperation(UpdateAccountOperation.of(accountId, newAmount));

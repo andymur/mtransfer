@@ -85,7 +85,7 @@ public class AccountServiceTest {
 
     private void checkAllAccountsAreCreated(final int accountsNumber) {
         for (int i = 1; i <= accountsNumber; i++) {
-            Assert.assertThat("", accountService.get(i), is(new AccountState(i, ONE_HUNDRED_MILLIONS)));
+            Assert.assertThat("Initial account value is incorrect", accountService.get(i), is(new AccountState(i, ONE_HUNDRED_MILLIONS)));
         }
     }
 

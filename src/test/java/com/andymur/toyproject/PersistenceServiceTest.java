@@ -34,7 +34,6 @@ import java.util.concurrent.Executors;
 
 import static org.hamcrest.CoreMatchers.is;
 
-//TODO: Add documentation and pretty logging in the tests
 public class PersistenceServiceTest {
 
     private static int NUMBER_OF_THREADS = 5;
@@ -73,12 +72,12 @@ public class PersistenceServiceTest {
         }
 
         Status addOperationStatus = persistenceService.getOperationStatus(addOperationId);
-        Assert.assertThat("Adding account operation has been successfully completed",
+        Assert.assertThat("Adding account operation has failed",
                 addOperationStatus, is(Status.DONE));
 
         AccountState accountState = persistenceService.find(1L).orElse(AccountState.DEFAULT);
 
-        Assert.assertThat("Account exists and details are correct",
+        Assert.assertThat("Account details are incorrect",
                 accountState, is(new AccountState(1L, PI_AMOUNT)));
     }
 
@@ -90,11 +89,11 @@ public class PersistenceServiceTest {
         }
 
         Status addOperationStatus = persistenceService.getOperationStatus(addOperationId);
-        Assert.assertThat("Adding account operation has been successfully completed",
+        Assert.assertThat("Adding account operation has failed",
                 addOperationStatus, is(Status.DONE));
 
         AccountState accountState = persistenceService.find(1L).orElse(AccountState.DEFAULT);
-        Assert.assertThat("Account exists and details are correct",
+        Assert.assertThat("Account details are incorrect",
                 accountState, is(new AccountState(1L, PI_AMOUNT)));
 
         String updateOperationId = persistenceService.addOperation(UpdateAccountOperation.of(1L, E_AMOUNT));
@@ -104,11 +103,11 @@ public class PersistenceServiceTest {
 
         Status updateOperationStatus = persistenceService.getOperationStatus(updateOperationId);
 
-        Assert.assertThat("Updating account operations has been successfully completed",
+        Assert.assertThat("Updating account operations has failed",
                 updateOperationStatus, is(Status.DONE));
 
         AccountState updatedAccountState = persistenceService.find(1L).orElse(AccountState.DEFAULT);
-        Assert.assertThat("Updated account details are correct",
+        Assert.assertThat("Account details are incorrect",
                 updatedAccountState, is(new AccountState(1L, E_AMOUNT)));
     }
 
@@ -120,11 +119,11 @@ public class PersistenceServiceTest {
         }
 
         Status addOperationStatus = persistenceService.getOperationStatus(addOperationId);
-        Assert.assertThat("Adding account operation has been successfully completed",
+        Assert.assertThat("Adding account operation has failed",
                 addOperationStatus, is(Status.DONE));
 
         AccountState accountState = persistenceService.find(1L).orElse(AccountState.DEFAULT);
-        Assert.assertThat("Account exists and details are correct",
+        Assert.assertThat("Account details are incorrect",
                 accountState, is(new AccountState(1L, PI_AMOUNT)));
 
         String deleteOperationId = persistenceService.addOperation(DeleteAccountOperation.of(1L));
@@ -133,11 +132,11 @@ public class PersistenceServiceTest {
         }
 
         Status deleteOperationStatus = persistenceService.getOperationStatus(deleteOperationId);
-        Assert.assertThat("Deleting account operation has been successfully completed",
+        Assert.assertThat("Deleting account operation has failed",
                 deleteOperationStatus, is(Status.DONE));
 
         Optional<AccountState> deletedAccountState = persistenceService.find(1L);
-        Assert.assertThat("Account doesn't exist anymore", deletedAccountState, is(Optional.empty()));
+        Assert.assertThat("Account should not exist anymore", deletedAccountState, is(Optional.empty()));
     }
 
     @Test
@@ -148,7 +147,7 @@ public class PersistenceServiceTest {
         }
 
         Status addOperationStatus = persistenceService.getOperationStatus(firstAddOperationId);
-        Assert.assertThat("Adding first account operation has been successfully completed",
+        Assert.assertThat("Adding first account operation has failed",
                 addOperationStatus, is(Status.DONE));
 
         String secondAddOperationId = persistenceService.addOperation(AddAccountOperation.of(2L, E_AMOUNT));
@@ -157,17 +156,17 @@ public class PersistenceServiceTest {
         }
 
         addOperationStatus = persistenceService.getOperationStatus(secondAddOperationId);
-        Assert.assertThat("Adding second account operation has been successfully completed",
+        Assert.assertThat("Adding second account operation has failed",
                 addOperationStatus, is(Status.DONE));
 
         List<AccountState> accounts = persistenceService.list();
 
-        Assert.assertThat("Number of accounts is correct", accounts.size(), is(2));
+        Assert.assertThat("Number of accounts is incorrect", accounts.size(), is(2));
 
-        Assert.assertThat("First account exists and details are correct",
+        Assert.assertThat("First account's details are incorrect",
                 accounts.get(0), is(new AccountState(1L, PI_AMOUNT)));
 
-        Assert.assertThat("Second account exists and details are correct",
+        Assert.assertThat("Second account's details are incorrect",
                 accounts.get(1), is(new AccountState(2L, E_AMOUNT)));
     }
 
