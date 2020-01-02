@@ -1,3 +1,4 @@
+# Some handy functions for log handling / debugging
 
 def in_gen_ops(acc_id):
     return in_ops(gen_ops, acc_id)

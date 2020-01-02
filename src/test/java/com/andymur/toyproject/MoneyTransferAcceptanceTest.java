@@ -28,7 +28,6 @@ import static com.andymur.toyproject.util.AcceptanceTestHelper.generateTransferO
 import static com.andymur.toyproject.util.AcceptanceTestHelper.prepareAccountsToCreate;
 import static com.andymur.toyproject.util.AcceptanceTestHelper.stringifyTransferOperations;
 
-//TODO: document me
 public class MoneyTransferAcceptanceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MoneyTransferAcceptanceTest.class);
@@ -117,7 +116,6 @@ public class MoneyTransferAcceptanceTest {
         AcceptanceTestHelper.makeAllTransfers(executorService, transferOperations, restClientHelper::transfer, 30L);
     }
 
-    //TODO: add comment
     private void checkWarningCauseOfJerseyDuplicateRequests(final List<AccountState> accountExpectedFinalStates,
                                                             final List<AccountState> accountActualFinalStates) {
         checkAllMoneyTransferredCorrectly(accountExpectedFinalStates, accountActualFinalStates, true);
