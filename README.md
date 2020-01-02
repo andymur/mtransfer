@@ -15,5 +15,7 @@
 
 # Other things
 * Make transfer result to be enum (+corner cases for transfer) (N)
-* Calculate preconditions for multi threaded tests (-)
 * Distinguish between integration (at least final acceptance) and unit tests (T)
+
+# To be done
+* Calculate preconditions for multi threaded tests (-)
