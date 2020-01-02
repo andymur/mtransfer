@@ -6,11 +6,7 @@ AccountResourceTest
 	- Add corner cases (T)
 	- Add persistence mock (T)
 
-MoneyTransferAcceptanceTest:
-	- Add queue for POST operations (T?)
-
 AccountServiceTest
-    - Remove shared methods from MoneyTransferAcceptanceTest somewhere (N)
 	- Add corner cases for transfer (T)
 
 Application
