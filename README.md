@@ -9,8 +9,6 @@
 * Add corner cases for transfer (T)
 
 # Application
-* Fix health check warning (T)
-* Fix dependencies duplication (T)
 * Add normal read me (F)
 
 # Other things
@@ -19,3 +17,6 @@
 
 # To be done
 * Calculate preconditions for multi threaded tests (-)
+
+# Instructions
+* Make sure port is accessible 

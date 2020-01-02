@@ -70,7 +70,6 @@ public class MoneyTransferAcceptanceTest {
         SUPPORT.after();
     }
 
-
     @Test
     public void shouldHaveCorrectAccountDetailsAfterMoneyTransferring() throws InterruptedException {
 
@@ -89,10 +88,10 @@ public class MoneyTransferAcceptanceTest {
         //making all the transfers
         makeAllTransfers(TRANSFERRING_EXECUTOR_SERVICE, REST_CLIENT_HELPER, transferOperations);
 
+        LOGGER.info("Resource log transfer requests. {}", resourceAuditLog.stringifyLog());
+
         final List<AccountState> accountsActualFinalState = getAccountsActualState(REST_CLIENT_HELPER, accountsNumber);
         LOGGER.info("Actual accounts final state. {}", accountsActualFinalState);
-
-        LOGGER.info("Resource log transfer requests. {}", resourceAuditLog.stringifyLog());
 
         final List<AccountState> accountsExpectedFinalState = calculateAccountsFinalState(accountsToCreate, resourceAuditLog.getLog());
         LOGGER.info("Calculated accounts final state. {}", accountsExpectedFinalState);

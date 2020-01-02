@@ -113,7 +113,7 @@ public class AcceptanceTestHelper {
                 LOGGER.warn("Actual and expected accounts' amounts must be equal to each other, actual = {}, expected = {}",
                         actualAccountState.getAmount(), accountFinalState.getAmount());
             } else {
-                Assert.assertThat("Actual and expected accounts' amounts must be equal to each other",
+                Assert.assertThat("Actual and expected accounts' amounts must be equal to each other, id: " + actualAccountState.getId(),
                         actualAccountState.getAmount(), is(accountFinalState.getAmount()));
             }
         }
