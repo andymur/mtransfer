@@ -9,7 +9,6 @@
 * Add corner cases for transfer (T)
 
 # Application
-* Add banner (F)
 * Fix health check warning (T)
 * Fix dependencies duplication (T)
 * Add normal read me (F)
