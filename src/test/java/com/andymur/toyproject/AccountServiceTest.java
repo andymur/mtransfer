@@ -29,6 +29,14 @@ import static com.andymur.toyproject.util.AcceptanceTestHelper.prepareAccountsTo
 import static com.andymur.toyproject.util.AcceptanceTestHelper.stringifyTransferOperations;
 import static org.hamcrest.CoreMatchers.is;
 
+/**
+ * Main test for the account service (transfer operation).
+ *
+ * Test does this steps (n times):
+ * - generates random transfer operations
+ * - applies all of them from many threads
+ * - reads all account states and verifies that all generated operations were applied in a correct way
+ */
 public class AccountServiceTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(MoneyTransferAcceptanceTest.class);
 
@@ -43,6 +51,17 @@ public class AccountServiceTest {
 
     private AccountService accountService;
 
+    /**
+     * In the test we assume that there is always enough credits to transfer
+     *
+     * For this reason initial sum of each account should be no less than
+     *
+     *  (max account number - 1) * max transfer size * max transfers
+     *
+     *  corner case when transfer size is larger than donor account tested in AccountResourceTest
+     *
+     *  same idea in MoneyTransferAcceptanceTest
+     */
     private static final BigDecimal ONE_HUNDRED_MILLIONS = new BigDecimal("100000000.00");
     private static final Pair<Integer, Integer> FROM_TO_ACCOUNT_NUMBER = Pair.of(200, 1000);
     private static final Pair<Integer, Integer> FROM_TO_TRANSFER_SIZE = Pair.of(10, 20);

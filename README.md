@@ -9,7 +9,7 @@ Done using Dropwizard (with Jersey, H2). Service is running by Jetty.
 
 # How to test the service
 
-One can simply run ```maven clean test``` to launch all the tests including tests of the persistence layer 
+One can simply run ```mvn clean test``` to launch all the tests including tests of the persistence layer 
 and ```MoneyTransferAcceptanceTest``` as a integration test.
 
 If you want to test REST resource please find ```AccountResourceTest```
@@ -20,7 +20,7 @@ Make sure that ```8090``` is free to use.
 
 # How to use the service
 
-Just build it using ```maven clean install``` and run with ```java -jar target/mtransfer-1.0-SNAPSHOT.jar server mtransfer.yml```
+Just build it using ```mvn clean install``` and run with ```java -jar target/mtransfer-1.0-SNAPSHOT.jar server mtransfer.yml```
 
 Make sure that ```8090``` is free to use.
 
