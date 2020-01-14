@@ -66,6 +66,6 @@ public class AccountState {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, amount);
+        return Objects.hash(id);
     }
 }
