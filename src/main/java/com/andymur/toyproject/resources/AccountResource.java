@@ -5,7 +5,6 @@ import com.andymur.toyproject.core.AccountState;
 import com.andymur.toyproject.core.TransferOperationResult;
 import com.andymur.toyproject.core.TransferOperationsAuditLog;
 import com.andymur.toyproject.core.util.TransferOperation;
-import org.omg.PortableInterceptor.SUCCESSFUL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
