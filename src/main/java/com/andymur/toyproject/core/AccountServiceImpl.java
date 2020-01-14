@@ -1,6 +1,7 @@
 package com.andymur.toyproject.core;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,7 +21,7 @@ public class  AccountServiceImpl implements AccountService {
 
     private static final String OK = "OK";
 
-    private final Map<Long, AccountState> accounts = new ConcurrentHashMap<>();
+    private final Map<Long, AccountState> accounts = new HashMap<>();
 
     private final PersistenceService persistenceService;
 
@@ -34,14 +35,16 @@ public class  AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountState put(final AccountState accountState) {
-        accounts.put(accountState.getId(), accountState);
-        persistenceService.addOperation(AddAccountOperation.of(accountState.getId(), accountState.getAmount()));
-        return accountState;
+    public synchronized AccountState put(final AccountState accountState) {
+        synchronized (accountState) {
+            accounts.put(accountState.getId(), accountState);
+            persistenceService.addOperation(AddAccountOperation.of(accountState.getId(), accountState.getAmount()));
+            return accountState;
+        }
     }
 
     @Override
-    public Optional<AccountState> delete(final long id) {
+    public synchronized Optional<AccountState> delete(final long id) {
         Optional<AccountState> result = Optional.ofNullable(accounts.remove(id));
         persistenceService.addOperation(DeleteAccountOperation.of(id));
         return result;
