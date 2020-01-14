@@ -28,6 +28,15 @@ import static com.andymur.toyproject.util.AcceptanceTestHelper.generateTransferO
 import static com.andymur.toyproject.util.AcceptanceTestHelper.prepareAccountsToCreate;
 import static com.andymur.toyproject.util.AcceptanceTestHelper.stringifyTransferOperations;
 
+/**
+ * Very similar to AccountServiceTest test (in term of test steps and idea)
+ *
+ * The difference is that test does it in the whole system without much mocks.
+ *
+ * (Only persistence is mocked, we can/should definitely get rid of this also,
+ * Persistence tested in PersistenceServiceTest).
+ *
+ */
 public class MoneyTransferAcceptanceTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MoneyTransferAcceptanceTest.class);
@@ -92,6 +101,7 @@ public class MoneyTransferAcceptanceTest {
 
         LOGGER.info("Resource log transfer requests. {}", resourceAuditLog.stringifyLog());
 
+        // See checkWarningCauseOfJerseyDuplicateRequests
         final List<AccountState> accountsExpectedFinalState = calculateAccountsFinalState(accountsToCreate, resourceAuditLog.getLog());
         LOGGER.info("Calculated accounts final state. {}", accountsExpectedFinalState);
 
@@ -116,6 +126,11 @@ public class MoneyTransferAcceptanceTest {
         AcceptanceTestHelper.makeAllTransfers(executorService, transferOperations, restClientHelper::transfer, 30L);
     }
 
+    // I've found that sometimes jersey rest client send request twice
+    // see https://stackoverflow.com/questions/37956741/jersey-resource-receiving-duplicate-requests-from-jersey-client
+    // https://github.com/jersey/jersey/issues/3526
+    // for that reason we have audit log (all the operations were actually applied from the test)
+    // we log warning here when generated (assumed) number of transfer operation does not equal to really applied ones
     private void checkWarningCauseOfJerseyDuplicateRequests(final List<AccountState> accountExpectedFinalStates,
                                                             final List<AccountState> accountActualFinalStates) {
         checkAllMoneyTransferredCorrectly(accountExpectedFinalStates, accountActualFinalStates, true);
