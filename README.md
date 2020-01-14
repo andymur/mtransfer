@@ -31,4 +31,12 @@ Basically ```account``` resource will be ready with CRUD operations like
 * ```DELETE``` (for deleting an account)
 * ```POST``` for transfer operation
 
+# Room for improvements
+
+* Currently working from multiple threads are handled in one-thread approach.
+Conceptually it is not bad per se but could be done in a bit more accurate way (e.g. event loop style).
+* We don't load all the data from the persistence on system startup. Needed to be implemented.
+* Persistence level not fully covered by integration tests yet.
+* Use different HTTP codes for different errors.
+
 Enjoy!
