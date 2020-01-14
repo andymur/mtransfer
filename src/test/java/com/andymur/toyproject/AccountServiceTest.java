@@ -57,7 +57,7 @@ public class AccountServiceTest {
     public void tearDown() {
     }
 
-    @RepeatedTest(10)
+    @RepeatedTest(1000)
     public void shouldHaveCorrectAccountDetailsAfterMoneyTransferring() throws InterruptedException {
         final int accountsNumber = generateInt(FROM_TO_ACCOUNT_NUMBER);
         LOGGER.info("Number of accounts: {}", accountsNumber);

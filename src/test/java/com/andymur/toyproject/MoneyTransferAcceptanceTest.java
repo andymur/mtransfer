@@ -17,7 +17,7 @@ import io.dropwizard.testing.DropwizardTestSupport;
 import io.dropwizard.testing.ResourceHelpers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +69,7 @@ public class MoneyTransferAcceptanceTest {
         SUPPORT.after();
     }
 
-    @Test
+    @RepeatedTest(100)
     public void shouldHaveCorrectAccountDetailsAfterMoneyTransferring() throws InterruptedException {
 
         final int accountsNumber = generateInt(FROM_TO_ACCOUNT_NUMBER);

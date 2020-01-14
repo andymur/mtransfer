@@ -29,7 +29,7 @@ public class  AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountState get(final long id) {
+    public synchronized AccountState get(final long id) {
         return accounts.get(id);
     }
 
@@ -48,7 +48,7 @@ public class  AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public TransferOperationResult transfer(final long sourceAccountId,
+    public synchronized TransferOperationResult transfer(final long sourceAccountId,
                          final long destinationAccountId,
                          final BigDecimal amountToTransfer) {
         try {
@@ -66,10 +66,8 @@ public class  AccountServiceImpl implements AccountService {
     private void lockAndTransfer(final long lowerAccountId,
                           final long upperAccountId,
                           final BigDecimal amountToTransfer) {
-        final AccountState lowerAccount = accounts.get(lowerAccountId);
-        final AccountState upperAccount = accounts.get(upperAccountId);
-        synchronized (lowerAccount) {
-           synchronized (upperAccount) {
+        synchronized (accounts.get(lowerAccountId)) {
+           synchronized (accounts.get(upperAccountId)) {
                 withdraw(lowerAccountId, amountToTransfer);
                 deposit(upperAccountId, amountToTransfer);
             }
@@ -97,7 +95,6 @@ public class  AccountServiceImpl implements AccountService {
 
             throw new IllegalStateException("Amount to withdraw is greater than account has.");
         }
-
         accounts.put(accountId, new AccountState(accountId, newAmount));
         persistenceService.addOperation(UpdateAccountOperation.of(accountId, newAmount));
     }
